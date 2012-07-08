@@ -25,6 +25,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency("cowtech-lib", "~> 1.9.8.0")
   gem.add_dependency("hashie", "~> 1.2.0")
   gem.add_dependency("rainbow", "~> 1.1.0")
+
+  gem.add_development_dependency("rspec", "~> 2.10.0")
 end
 
 
