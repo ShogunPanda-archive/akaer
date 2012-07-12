@@ -4,12 +4,6 @@
 # Licensed under the MIT license, which can be found at http://www.opensource.org/licenses/mit-license.php.
 #
 
-module Akaer
-  module Version
-    MAJOR = 0
-    MINOR = 2
-    PATCH = 0
-
-    STRING = [MAJOR, MINOR, PATCH].compact.join(".")
-  end
-end
+require "rubygems"
+require "bundler/setup"
+require "akaer"

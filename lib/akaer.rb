@@ -11,8 +11,6 @@ require "hashie"
 require "rainbow"
 require "pathname"
 
-Sickill::Rainbow.enabled = true
-
 require "akaer/version" if !defined?(Akaer::Version)
 require "akaer/errors"
 require "akaer/logger"

@@ -20,7 +20,6 @@ module Akaer
     end
 
     def initialize
-      Akaer::Logger.start_time = Time.now
       super(:args => {:name => "Interface aliases", :version => 1.0, :description => "A small utility to add aliases to network interfaces.", :usage => "Usage: #{ARGV[0]} [OPTIONS] [add|remove]"})
     end
 
@@ -38,18 +37,6 @@ module Akaer
       ]
     end
 
-    def create_logger(file, level = Logger::INFO)
-      file = case file
-        when "STDOUT" then $stdout
-        when "STDERR" then $stderr
-        else file
-      end
-
-      rv = Akaer::Logger.new(file)
-      rv.level = level.to_i
-      rv
-    end
-
     def execute_command(interface, action, ip, prefix = "")
       prefix += " " if !prefix.blank?
       @logger.info("#{prefix}#{(action == "add" ? "Adding" : "Removing").bright} alias #{ip.bright} #{action == "add" ? "to" : "from"} interface #{interface.bright}.")
@@ -57,7 +44,7 @@ module Akaer
     end
 
     def run
-      @logger = self.create_logger(@options_parser["log-file"], @options_parser["log-level"])
+      @logger = Akaer::Logger.create(@options_parser["log-file"], @options_parser["log-level"])
 
       command = (@options_parser.args[0] || "add").downcase
       aliases = []
@@ -73,7 +60,7 @@ module Akaer
       end
 
       # Instantiate the logger
-      logger = self.create_logger(configuration.log_file, configuration.log_level)
+      logger = Akaer::Logger.create(configuration.log_file, configuration.log_level)
 
       # Create address
       if !["add", "remove"].include?(command) then

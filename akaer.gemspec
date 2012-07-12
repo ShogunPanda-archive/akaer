@@ -26,7 +26,9 @@ Gem::Specification.new do |gem|
   gem.add_dependency("hashie", "~> 1.2.0")
   gem.add_dependency("rainbow", "~> 1.1.0")
 
-  gem.add_development_dependency("rspec", "~> 2.10.0")
+  gem.add_development_dependency("rspec", "~> 2.11.0")
+  gem.add_development_dependency("rcov", "~> 1.0.0")
+  gem.add_development_dependency("pry", "~> 0.9.9")
 end
 
 
