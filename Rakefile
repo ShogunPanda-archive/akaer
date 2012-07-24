@@ -9,7 +9,10 @@ require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new("spec")
 
-desc "Run all specs with rcov"
-RSpec::Core::RakeTask.new("spec:coverage") do |t|
-  t.rcov_opts =  %q[--exclude "spec"]
+namespace :spec do
+  desc "Run all specs with coverage"
+  task :coverage do
+    ENV["AKAER_COVERAGE"] = "TRUE"
+    Rake::Task["spec"].invoke
+  end
 end

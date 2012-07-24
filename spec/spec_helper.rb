@@ -6,4 +6,5 @@
 
 require "rubygems"
 require "bundler/setup"
+require "coverage_helper"
 require "akaer"
