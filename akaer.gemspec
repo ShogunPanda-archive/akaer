@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency("cowtech-extensions", "~> 2.7.0")
-  gem.add_dependency("cowtech-lib", "~> 1.9.8.0")
+  gem.add_dependency("cowtech-lib", "~> 2.0.0")
   gem.add_dependency("hashie", "~> 1.2.0")
   gem.add_dependency("rainbow", "~> 1.1.0")
 
