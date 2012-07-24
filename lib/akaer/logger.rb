@@ -16,16 +16,22 @@ module Akaer
     end
 
     def self.create(file, level = Logger::INFO, formatter = nil)
-      file = case file
+      rv = self.new(self.get_real_file(file))
+      rv.level = level.to_i
+      rv.formatter = formatter || self.default_formatter
+      rv
+    end
+
+    def self.get_real_file(file)
+      case file
         when "STDOUT" then $stdout
         when "STDERR" then $stderr
         else file
       end
+    end
 
-      rv = self.new(file)
-      rv.level = level.to_i
-      rv.formatter = formatter || self.default_formatter
-      rv
+    def self.default_file
+      $stdout
     end
 
     def self.default_formatter
@@ -39,9 +45,9 @@ module Akaer
           else nil
         end
 
-        header = ("[%s T+%0.5f]" %[datetime.strftime("%Y/%b/%d %H:%M:%S"), [datetime.to_f - self.start_time.to_f, 0].max, msg]).bright
+        header = ("[%s T+%0.5f] %s:" %[datetime.strftime("%Y/%b/%d %H:%M:%S"), [datetime.to_f - self.start_time.to_f, 0].max, severity.rjust(5)]).bright
         header = header.color(color) if color.present?
-        log = "%s %s\n" % [header, msg]
+        "%s %s\n" % [header, msg]
       }
     end
 

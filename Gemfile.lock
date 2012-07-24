@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    akaer (0.1.0)
-      cowtech-extensions (~> 2.1.0)
+    akaer (0.2.0)
+      cowtech-extensions (~> 2.5.0)
       cowtech-lib (~> 1.9.8.0)
       hashie (~> 1.2.0)
       rainbow (~> 1.1.0)
@@ -28,9 +28,10 @@ GEM
       multi_json (~> 1.0)
     builder (3.0.0)
     coderay (1.0.6)
-    cowtech-extensions (2.1.0)
+    cowtech-extensions (2.5.1)
       actionpack (~> 3.0)
-      tzinfo (~> 0.3.33)
+      json (~> 1.7.0)
+      tzinfo (~> 0.3.0)
     cowtech-lib (1.9.8.1)
       jeweler
       open4

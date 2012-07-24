@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]
 
-  gem.add_dependency("cowtech-extensions", "~> 2.1.0")
+  gem.add_dependency("cowtech-extensions", "~> 2.5.0")
   gem.add_dependency("cowtech-lib", "~> 1.9.8.0")
   gem.add_dependency("hashie", "~> 1.2.0")
   gem.add_dependency("rainbow", "~> 1.1.0")
