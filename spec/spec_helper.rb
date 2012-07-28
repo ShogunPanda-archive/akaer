@@ -8,3 +8,9 @@ require "rubygems"
 require "bundler/setup"
 require "coverage_helper"
 require "akaer"
+
+RSpec.configure do |config|
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+end

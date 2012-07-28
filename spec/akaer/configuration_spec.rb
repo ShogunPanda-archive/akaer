@@ -7,5 +7,5 @@
 require "spec_helper"
 
 describe Akaer::Configuration do
-  pending "To all."
+  pending "Test all."
 end
