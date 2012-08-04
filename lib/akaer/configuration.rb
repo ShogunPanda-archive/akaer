@@ -5,37 +5,52 @@
 #
 
 module Akaer
-  class Configuration < Hashie::Dash
+  # This class holds the configuration of the applicaton.
+  class Configuration < Bovem::Configuration
+    # The default interface to manage. Default: `lo0`.
     property :interface, :default => "lo0"
+
+    # The default list of aliases to add. Default: `[]`.
     property :addresses, :default => []
+
+    # The starting address for sequential aliases. Default: `10.0.0.1`.
     property :start_address, :default => "10.0.0.1"
+
+    # The number of aliases to add. Default: `5`.
     property :aliases, :default => 5
+
+    # The command to run for adding an alias. Default: `sudo ifconfig @INTERFACE@ alias @ALIAS@`.
+    property :add_command, :default => "sudo ifconfig @INTERFACE@ alias @ALIAS@"
+
+    # The command to run for removing an alias. Default: `sudo ifconfig @INTERFACE@ alias @ALIAS@`.
+    property :remove_command, :default => "sudo ifconfig @INTERFACE@ -alias @ALIAS@"
+
+    # The file to log to. Default is the standard output.
     property :log_file, :default => "STDOUT"
+
+    # The minimum severity to log. Default: `Logger::INFO`.
     property :log_level, :default => Logger::INFO
 
-    def self.load(file = nil, logger = nil)
-      if logger.blank? then
-        logger ||= Akaer::Logger.new($stderr)
-        logger.level = Logger::INFO
-      end
+    # Only show which modifications will be done.
+    property :dry_run, :default => false
 
-      rv = self.new
-      if file.present? then
-        begin
-          # Open the file
-          path = Pathname.new(File.expand_path(file)).realpath
-          logger.debug("Using configuration file #{path}.")
+    # Do not show any message.
+    property :quiet, :default => false
 
-          rv.tap do |config|
-            eval(File.read(path))
-          end
-        rescue Errno::ENOENT, LoadError
-        rescue Exception
-          raise Akaer::Errors::InvalidConfiguration.new("Config file #{file.bright} is not valid.")
-        end
-      end
+    # Creates a new configuration.
+    #
+    # @param file [String] The file to read.
+    # @param overrides [Hash] A set of values which override those set in the configuration file.
+    # @param logger [Logger] The logger to use for notifications.
+    def initialize(file = nil, overrides = {}, logger = nil)
+      super(file, overrides, logger)
 
-      rv
+      # Make sure some arguments are of correct type
+      self.log_file = $stdout if self.log_file == "STDOUT"
+      self.log_file = $stderr if self.log_file == "STDERR"
+      self.addresses = self.addresses.ensure_array
+      self.aliases = self.aliases.to_integer
+      self.log_level = self.log_level.to_integer
     end
   end
 end

@@ -34,15 +34,15 @@ By defaults, Akaer uses a configuration file in `~/.akaer_config`, but you can c
 The file is a plain Ruby file with a single `config` object that supports the following directives.
 
 * `interface`: The network interface to manage. `lo0` by default.
-* `address`: A specific list of aliases to manage.
-* `start-address`: The address to start sequential address. `10.0.0.1` by default. Not used if `addresses` is specified.
+* `addresses`: A specific list of aliases to manage.
+* `start_address`: The address to start sequential address. `10.0.0.1` by default. Not used if `addresses` is specified.
 * `aliases`: The number of sequential addresses to add. 5 by default.
+* `add_command`: The command to run for adding an alias. `sudo ifconfig @INTERFACE@ alias @ALIAS@` by default.
+* `remove_command`: The command to run for removing an alias. `sudo ifconfig @INTERFACE@ -alias @ALIAS@` by default.
 * `log_file`: The default log file. By default it logs to standard output.
 * `log_level`: The default log level. Valid values are from 0 to 5 where 0 means "all messages".
-
-## Remarks
-
-Akaer is tightly coupled with the UNIX tools, so it won't work for Windows.
+* `dry_run`: Only show which modifications will be done.
+* `quiet`: Do not show any message.
 
 ## Contributing to akaer
 

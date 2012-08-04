@@ -5,11 +5,20 @@
 #
 
 module Akaer
+  # The current version of lazier, according to semantic versioning.
+  #
+  # @see http://semver.org
   module Version
+    # The major version.
     MAJOR = 0
+
+    # The minor version.
     MINOR = 3
+
+    # The patch version.
     PATCH = 0
 
+    # The current version of akaer.
     STRING = [MAJOR, MINOR, PATCH].compact.join(".")
   end
 end

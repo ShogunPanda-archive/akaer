@@ -6,4 +6,86 @@
 
 require "rubygems"
 require "akaer"
-Akaer::Application.start
+require "gli"
+
+include GLI
+
+program_desc("A small utility to add aliases to network interfaces.")
+version(Akaer::Version::STRING)
+
+desc("The default interface to manage.")
+default_value("lo0")
+arg_name("INTERFACE")
+switch(:i, :interface)
+
+desc("The default list of aliases to add.")
+default_value([])
+arg_name("ADDRESSES")
+switch(:A, :addresses)
+
+desc("The starting address for sequential aliases.")
+default_value("10.0.0.1")
+arg_name("ADDRESS")
+switch(:s, "start-address")
+
+desc("The number of aliases to add.")
+default_value(5)
+arg_name("ALIASES")
+switch(:S, :aliases)
+
+desc("The command to run for adding an alias.")
+default_value("sudo ifconfig @INTERFACE@ alias @ALIAS@")
+arg_name("COMMAND")
+switch(:c, "add-command")
+
+desc("The command to run for adding an alias.")
+default_value("sudo ifconfig @INTERFACE@ -alias @ALIAS@")
+arg_name("COMMAND")
+switch(:C, "remove-command")
+
+desc("The default log file.")
+default_value("STDOUT")
+arg_name("LOG")
+flag([:l, :log])
+
+desc("The default log level. Valid values are from 0 to 5 where 0 means \"all messages\".")
+default_value(1)
+arg_name("LEVEL")
+flag([:L, "log-level"])
+
+desc("Only show which modifications will be done")
+switch([:n, "dry-run"])
+
+desc("Do not show any message.")
+switch([:q, :quiet])
+
+desc("Add aliases.")
+command [:a, :add] do |c|
+  c.action do |globals, locals, args|
+    Akaer::Application.instance(globals, locals, args).action_add()
+  end
+end
+
+desc("Remove aliases.")
+command [:r, :remove] do |c|
+  c.action do |globals, locals, args|
+    Akaer::Application.instance(globals, locals, args).action_remove()
+  end
+end
+
+desc("Install the application for autolaunch.")
+command [:i, :install] do |c|
+  c.action do |globals, locals, args|
+    Akaer::Application.instance(globals, locals, args).action_install()
+  end
+end
+
+desc("Uninstall the application from autolaunch.")
+command [:u, :uninstall] do |c|
+  c.action do |globals, locals, args|
+    Akaer::Application.instance(globals, locals, args).action_uninstall()
+  end
+end
+
+ARGV << "help" if ARGV.length == 0
+exit(GLI.run(ARGV))

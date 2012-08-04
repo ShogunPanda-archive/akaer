@@ -21,16 +21,13 @@ Gem::Specification.new do |gem|
   gem.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]
 
-  gem.add_dependency("cowtech-extensions", "~> 2.7.0")
-  gem.add_dependency("cowtech-lib", "~> 2.0.0")
-  gem.add_dependency("hashie", "~> 1.2.0")
-  gem.add_dependency("rainbow", "~> 1.1.0")
+  gem.add_dependency("bovem", ">= 0.5.0")
+  gem.add_dependency("gli", "~> 1.6.0")
 
   gem.add_development_dependency("rspec", "~> 2.11.0")
   gem.add_development_dependency("rake", "~> 0.9.0")
   gem.add_development_dependency("simplecov", "~> 0.6.0")
-  gem.add_development_dependency("pry", "~> 0.9.10")
-  gem.add_development_dependency("net-dns", "~> 0.7.0")
+  gem.add_development_dependency("pry", ">= 0")
   gem.add_development_dependency("yard", "~> 0.8.0")
   gem.add_development_dependency("redcarpet", "~> 2.1.0")
   gem.add_development_dependency("github-markup", "~> 0.7.0")

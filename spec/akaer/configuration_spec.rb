@@ -7,5 +7,17 @@
 require "spec_helper"
 
 describe Akaer::Configuration do
-  pending "Test all."
+  describe "#initialize" do
+    it "sets default arguments and rules" do
+      config = Akaer::Configuration.new
+      expect(config.interface).to eq("lo0")
+      expect(config.addresses).to eq([])
+      expect(config.start_address).to eq("10.0.0.1")
+      expect(config.aliases).to eq(5)
+      expect(config.add_command).to eq("sudo ifconfig @INTERFACE@ alias @ALIAS@")
+      expect(config.remove_command).to eq("sudo ifconfig @INTERFACE@ -alias @ALIAS@")
+      expect(config.log_file).to eq($stdout)
+      expect(config.log_level).to eq(Logger::INFO)
+    end
+  end
 end

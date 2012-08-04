@@ -4,16 +4,9 @@
 # Licensed under the MIT license, which can be found at http://www.opensource.org/licenses/mit-license.php.
 #
 
-require "cowtech-extensions"
-require "cowtech-lib"
+require "bovem"
 require "ipaddr"
-require "hashie"
-require "rainbow"
-require "pathname"
 
 require "akaer/version" if !defined?(Akaer::Version)
-require "akaer/errors"
-require "akaer/logger"
 require "akaer/configuration"
 require "akaer/application"
-
