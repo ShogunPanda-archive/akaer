@@ -38,14 +38,14 @@ module Akaer
         overrides = {
           :interface => @args[:global][:interface],
           :addresses => @args[:global][:addresses],
-          "start-address" => @args[:global]["start-address"],
+          :start_address => @args[:global][:"start-address"],
           :aliases => @args[:global][:aliases],
-          "add-command" => @args[:global]["add-command"],
-          "remove-command" => @args[:global]["remove-command"],
-          "log-file" => @args[:global]["log-file"],
-          "log-level" => @args[:global]["log-level"],
-          "dry-run" => @args[:global]["dry-run"],
-          "quiet" => @args[:global]["quiet"]
+          :add_command => @args[:global][:"add-command"],
+          :remove_command => @args[:global][:"remove-command"],
+          :log_file => @args[:global][:"log-file"],
+          :log_level => @args[:global][:"log-level"],
+          :dry_run => @args[:global][:"dry-run"],
+          :quiet => @args[:global][:quiet]
         }.reject {|k,v| v.nil? }
 
         @config = Akaer::Configuration.new(@args[:global][:config], overrides, @logger)
@@ -60,13 +60,46 @@ module Akaer
       self
     end
 
-    # Check if we are running on MacOS X.
+    # Checks if we are running on MacOS X.
     # System services are only available on that platform.
     #
     # @return [Boolean] `true` if the current platform is MacOS X, `false` otherwise.
     def is_osx?
       ::Config::CONFIG['host_os'] =~ /^darwin/
     end
+
+    # Checks if and address is a valid IPv4 address.
+    #
+    # @param address [String] The address to check.
+    # @return [Boolean] `true` if the address is a valid IPv4 address, `false` otherwise.
+    def is_ipv4?(address)
+      address = address.ensure_string
+
+      mo = /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\Z/.match(address)
+      rv = (mo && mo.captures.all? {|i| i.to_i < 256}) ? true : false
+    end
+
+    # Checks if and address is a valid IPv4 address.
+    #
+    # @param address [String] The address to check.
+    # @return [Boolean] `true` if the address is a valid IPv4 address, `false` otherwise.
+    def is_ipv6?(address)
+      address = address.ensure_string
+
+      rv = catch(:valid) do
+        # IPv6 (normal)
+        throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*\Z/ =~ address
+        throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*)?\Z/ =~ address
+        throw(:valid, true) if /\A::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*)?\Z/ =~ address
+        # IPv6 (IPv4 compat)
+        throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:/ =~ address && self.is_ipv4?($')
+        throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?/ =~ address && self.is_ipv4?($')
+        throw(:valid, true) if /\A::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?/ =~ address && self.is_ipv4?($')
+
+        false
+      end
+    end
+
 
     # Pads a number to make print friendly.
     #
@@ -97,93 +130,120 @@ module Akaer
     # @param command [String] The command to execute.
     # @return [Boolean] `true` if command succeeded, `false` otherwise.
     def execute_command(command)
-      system(command)
+      Kernel.system(command)
     end
 
-    #def execute_command(interface, action, ip, prefix = "")
-    #  prefix += " " if !prefix.blank?
-    #  @logger.info("#{prefix}#{(action == "add" ? "Adding" : "Removing").bright} alias #{ip.bright} #{action == "add" ? "to" : "from"} interface #{interface.bright}.")
-    #  system("sudo ifconfig #{interface} #{action == "add" ? "alias" : "-alias"} #{ip}")
-    #end
+    # Computes the list of address to manage.
+    #
+    # @param type [Symbol] The type of addresses to consider. Valid values are `:ipv4`, `:ipv6`, otherwise all addresses are considered.
+    # @return [Array] The list of addresses to add or remove from the interface.
+    def compute_addresses(type = :all)
+      rv = []
 
-    #def run
-    #  @logger = Akaer::Logger.create(@options_parser["log-file"], @options_parser["log-level"])
-    #
-    #  command = (@options_parser.args[0] || "add").downcase
-    #  aliases = []
-    #  target_address = ""
-    #
-    #  # Parse configuration file
-    #  configuration = Akaer::Configuration.load(@options_parser["configuration"], @logger)
-    #
-    #  # Now merge with the options
-    #  @options_parser[].each_pair do |option, value|
-    #    key = option.to_s.gsub("-", "_")
-    #    configuration[key] = value if configuration.has_key?(key) && @options_parser.provided?(option)
-    #  end
-    #
-    #  # Instantiate the logger
-    #  logger = Akaer::Logger.create(configuration.log_file, configuration.log_level)
-    #
-    #  # Create address
-    #  if !["add", "remove"].include?(command) then
-    #    @logger.fatal("\"Please choose an action between \"add\" or \"remove\".")
-    #    abort
-    #  end
-    #
-    #  begin
-    #    if configuration.addresses.blank? then
-    #      target_address = configuration.start_address
-    #      temp = IPAddr.new(target_address)
-    #
-    #      [configuration.aliases, 1].max.times do
-    #        aliases << temp.to_s
-    #        temp = temp.succ
-    #        target_address = temp.to_s
-    #      end
-    #    else
-    #      configuration.addresses.each do |t|
-    #        target_address = t
-    #        aliases << IPAddr.new(target_address)
-    #      end
-    #    end
-    #  rescue ArgumentError => e
-    #    logger.fatal("\"#{target_address}\" is not a valid IP address.")
-    #    abort
-    #  end
-    #
-    #  if !@options_parser["dry-run"] then
-    #    total = aliases.length
-    #    rj = total.to_s.length
-    #    aliases.each_with_index do |a, i|
-    #      prefix = "[#{(i + 1).to_s.rjust(rj, "0")}/#{total}]"
-    #      if !self.execute_command(configuration.interface, command, a, prefix) then
-    #        logger.fatal("#{command == "add" ? "Adding" : "Removing"} alias #{a} failed.")
-    #        abort
-    #      end
-    #    end
-    #  else
-    #    @logger.info("I will #{command.bright} #{aliases.length == 1 ? "this alias" : "these aliases"} #{command == "add" ? "to" : "from"} interface #{configuration.interface.bright}: #{aliases.collect {|a| a.bright}.join(", ")}.")
-    #  end
-    #end
+      if self.config.addresses.present? # We have an explicit list
+        rv = self.config.addresses
 
+        # Now filter the addresses
+        filters = [type != :ipv6 ? :ipv4 : nil, type != :ipv4 ? :ipv6 : nil].compact
+        rv = rv.select {|address|
+          filters.any? {|filter| self.send("is_#{filter}?", address) }
+        }.compact.uniq
+      else
+        begin
+          ip = IPAddr.new(self.config.start_address.ensure_string)
+          raise ArgumentError if (type == :ipv4 && !ip.ipv4?) || (type == :ipv6 && !ip.ipv6?)
+
+          (self.config.aliases > 0 ? self.config.aliases : 5).times do
+            rv << ip.to_s
+            ip = ip.succ
+          end
+        rescue ArgumentError
+        end
+      end
+
+      rv
+    end
+
+    # Adds or removes an alias from the interface
+    #
+    # @param type [Symbol] The operation to execute. Can be `:add` or `:remove`.
+    # @param address [String] The address to manage.
+    # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+    def manage(type, address)
+      rv = true
+
+      # Compute the command
+      command = (type == :remove) ? self.config.remove_command : self.config.add_command
+
+      # Interpolate
+      command = command.gsub("@INTERFACE@", self.config.interface).gsub("@ALIAS@", address) + " > /dev/null 2>&1"
+
+      # Compute the prefix
+      @addresses ||= self.compute_addresses
+      length = self.pad_number(@addresses.length)
+      index = (@addresses.index(address) || 0) + 1
+      prefix = ["[".color(:cyan), self.pad_number(index, length.length).bright, "/".color(:cyan), length.bright, "]".color(:cyan)].join("")
+
+      # Now execute
+      if !self.config.dry_run then
+        @logger.info("#{prefix} #{(type == :remove ? "Removing" : "Adding").bright} address #{address.bright} #{type != :remove ? "to" : "from"} interface #{self.config.interface.bright}...") if !self.config.quiet
+        rv = self.execute_command(command)
+
+        # TODO: The end badge.
+      else
+        @logger.info("#{prefix} I will #{(type == :remove ? "remove" : "add").bright} address #{address.bright} #{type != :remove ? "to" : "from"} interface #{self.config.interface.bright}.") if !self.config.quiet
+      end
+
+      rv
+    end
+
+    # Adds aliases to the interface.
+    #
+    # @return [Boolean] `true` if action succedeed, `false` otherwise.
+    def action_add
+      addresses = self.compute_addresses
+
+      if addresses.present? then
+        # Now, for every address, call the command
+        addresses.all? {|address|
+          self.manage(:add, address)
+        }
+      else
+        @logger.error("No valid addresses to add to the interface found.") if !self.config.quiet
+      end
+    end
+
+    # Removes aliases to the interface.
+    #
+    # @return [Boolean] `true` if action succedeed, `false` otherwise.
+    def action_remove
+      addresses = self.compute_addresses
+
+      if addresses.present? then
+        # Now, for every address, call the command
+        addresses.all? {|address|
+          self.manage(:remove, address)
+        }
+      else
+        @logger.error("No valid addresses to remove from the interface found.") if !self.config.quiet
+      end
+    end
 
     # Installs the application into the autolaunch.
     #
     # @return [Boolean] `true` if action succedeed, `false` otherwise.
-
     def action_install
       logger = get_logger
 
       if !self.is_osx? then
-        logger.fatal("Install akaer on autolaunch is only available on MacOSX.")
+        logger.fatal("Install akaer on autolaunch is only available on MacOSX.") if !self.config.quiet
         return false
       end
 
       launch_agent = self.launch_agent_path
 
       begin
-        logger.info("Creating the launch agent in #{launch_agent} ...")
+        logger.info("Creating the launch agent in #{launch_agent} ...") if !self.config.quiet
 
         args = $ARGV ? $ARGV[0, $ARGV.length - 1] : []
 
@@ -194,15 +254,15 @@ module Akaer
         }
         self.execute_command("plutil -convert binary1 \"#{launch_agent}\"")
       rescue => e
-        logger.error("Cannot create the launch agent.")
+        logger.error("Cannot create the launch agent.") if !self.config.quiet
         return false
       end
 
       begin
-        logger.info("Loading the launch agent ...")
+        logger.info("Loading the launch agent ...") if !self.config.quiet
         self.execute_command("launchctl load -w \"#{launch_agent}\" > /dev/null 2>&1")
       rescue => e
-        logger.error("Cannot load the launch agent.")
+        logger.error("Cannot load the launch agent.") if !self.config.quiet
         return false
       end
 
@@ -216,7 +276,7 @@ module Akaer
       logger = self.get_logger
 
       if !self.is_osx? then
-        logger.fatal("Install akaer on autolaunch is only available on MacOSX.")
+        logger.fatal("Install akaer on autolaunch is only available on MacOSX.") if !self.config.quiet
         return false
       end
 
@@ -226,7 +286,7 @@ module Akaer
       begin
         self.execute_command("launchctl unload -w \"#{launch_agent}\" > /dev/null 2>&1")
       rescue => e
-        logger.warn("Cannot unload the launch agent.")
+        logger.warn("Cannot unload the launch agent.") if !self.config.quiet
       end
 
       # Delete the launch agent.
@@ -234,7 +294,7 @@ module Akaer
         logger.info("Deleting the launch agent #{launch_agent} ...")
         ::File.delete(launch_agent)
       rescue => e
-        logger.warn("Cannot delete the launch agent.")
+        logger.warn("Cannot delete the launch agent.") if !self.config.quiet
         return false
       end
 
