@@ -158,7 +158,7 @@ describe Akaer::Application do
     end
 
     it "should return false if the command failed" do
-      expect(other_application.manage(:add, "10.0.0.256")).to be_false
+      expect(application.manage(:add, "10.0.0.256")).to be_false
     end
 
     it "should respect dry-run mode" do
