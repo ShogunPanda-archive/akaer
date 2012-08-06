@@ -153,11 +153,12 @@ describe Akaer::Application do
     end
 
     it "should return true if the command succeded" do
-      expect(application.manage(:add, "10.0.0.3")).to be_true
+      other_application = Akaer::Application.new({:"add-command" => "echo @INTERFACE@", :quiet => true})
+      expect(other_application.manage(:add, "10.0.0.3")).to be_true
     end
 
     it "should return false if the command failed" do
-      expect(application.manage(:add, "10.0.0.256")).to be_false
+      expect(other_application.manage(:add, "10.0.0.256")).to be_false
     end
 
     it "should respect dry-run mode" do

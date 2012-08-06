@@ -9,17 +9,21 @@ http://github.com/ShogunPanda/akaer
 
 ## Description
 
-Akaer is a small utility that adds and remove aliases to your network interfaces. This is useful in web development.
+Akaer is a small utility that adds and removes aliases to your network interfaces. This is useful in web development.
 
 ## Basic usage
 
 1. Install the gem:
 
-	`gem install akaer`
+ 	```sh
+	gem install akaer
+	```
 
 2. Run the application:
 
-	`akaer`
+	```sh
+	akaer
+ 	```
 
 **You're done!**
 

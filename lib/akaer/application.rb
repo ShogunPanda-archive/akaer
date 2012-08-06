@@ -101,7 +101,7 @@ module Akaer
     end
 
 
-    # Pads a number to make print friendly.
+    # Pads a number to make it print friendly.
     #
     # @param num [Fixnum] The number to pad.
     # @param len [Fixnum] The minimum length of the padded string.
@@ -213,7 +213,7 @@ module Akaer
       end
     end
 
-    # Removes aliases to the interface.
+    # Removes aliases from the interface.
     #
     # @return [Boolean] `true` if action succedeed, `false` otherwise.
     def action_remove
