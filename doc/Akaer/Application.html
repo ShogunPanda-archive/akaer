@@ -469,7 +469,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Checks if and address is a valid IPv4 address.</p>
+    <span class="summary_desc"><div class='inline'><p>Checks if and address is a valid IPv6 address.</p>
 </div></span>
   
 </li>
@@ -910,13 +910,13 @@
       <pre class="lines">
 
 
-303
 304
 305
-306</pre>
+306
+307</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 303</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 304</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_instance'>instance</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_force'>force</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='ivar'>@instance</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_force'>force</span>
@@ -975,7 +975,6 @@
       <pre class="lines">
 
 
-197
 198
 199
 200
@@ -986,10 +985,11 @@
 205
 206
 207
-208</pre>
+208
+209</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 197</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 198</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_action_add'>action_add</span>
   <span class='id identifier rubyid_addresses'>addresses</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_compute_addresses'>compute_addresses</span>
@@ -1050,7 +1050,6 @@
       <pre class="lines">
 
 
-229
 230
 231
 232
@@ -1085,10 +1084,11 @@
 261
 262
 263
-264</pre>
+264
+265</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 229</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 230</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_action_install'>action_install</span>
   <span class='id identifier rubyid_logger'>logger</span> <span class='op'>=</span> <span class='id identifier rubyid_get_logger'>get_logger</span>
@@ -1173,7 +1173,6 @@
       <pre class="lines">
 
 
-213
 214
 215
 216
@@ -1184,10 +1183,11 @@
 221
 222
 223
-224</pre>
+224
+225</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 213</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 214</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_action_remove'>action_remove</span>
   <span class='id identifier rubyid_addresses'>addresses</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_compute_addresses'>compute_addresses</span>
@@ -1248,7 +1248,6 @@
       <pre class="lines">
 
 
-269
 270
 271
 272
@@ -1275,10 +1274,11 @@
 293
 294
 295
-296</pre>
+296
+297</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 269</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 270</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_action_uninstall'>action_uninstall</span>
   <span class='id identifier rubyid_logger'>logger</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_logger'>get_logger</span>
@@ -1376,7 +1376,6 @@
       <pre class="lines">
 
 
-135
 136
 137
 138
@@ -1401,10 +1400,11 @@
 157
 158
 159
-160</pre>
+160
+161</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 135</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 136</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_compute_addresses'>compute_addresses</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:all</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_rv'>rv</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1498,12 +1498,12 @@
       <pre class="lines">
 
 
-127
 128
-129</pre>
+129
+130</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 127</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 128</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execute_command'>execute_command</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
   <span class='const'>Kernel</span><span class='period'>.</span><span class='id identifier rubyid_system'>system</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
@@ -1555,12 +1555,12 @@
       <pre class="lines">
 
 
-111
 112
-113</pre>
+113
+114</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 111</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 112</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_logger'>get_logger</span>
   <span class='ivar'>@logger</span> <span class='op'>||=</span> <span class='const'>Bovem</span><span class='op'>::</span><span class='const'>Logger</span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span><span class='lparen'>(</span><span class='const'>Bovem</span><span class='op'>::</span><span class='const'>Logger</span><span class='period'>.</span><span class='id identifier rubyid_default_file'>default_file</span><span class='comma'>,</span> <span class='ivar'>@config</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span><span class='comma'>,</span> <span class='ivar'>@log_formatter</span><span class='rparen'>)</span>
@@ -1631,15 +1631,15 @@
       <pre class="lines">
 
 
-70
 71
 72
 73
 74
-75</pre>
+75
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 70</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 71</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_is_ipv4?'>is_ipv4?</span><span class='lparen'>(</span><span class='id identifier rubyid_address'>address</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_address'>address</span> <span class='op'>=</span> <span class='id identifier rubyid_address'>address</span><span class='period'>.</span><span class='id identifier rubyid_ensure_string'>ensure_string</span>
@@ -1663,7 +1663,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Checks if and address is a valid IPv4 address.</p>
+    <p>Checks if and address is a valid IPv6 address.</p>
 
 
   </div>
@@ -1700,7 +1700,7 @@
       
       
         &mdash;
-        <div class='inline'><p><code>true</code> if the address is a valid IPv4 address, <code>false</code> otherwise.</p>
+        <div class='inline'><p><code>true</code> if the address is a valid IPv6 address, <code>false</code> otherwise.</p>
 </div>
       
     </li>
@@ -1713,7 +1713,6 @@
       <pre class="lines">
 
 
-81
 82
 83
 84
@@ -1728,10 +1727,11 @@
 93
 94
 95
-96</pre>
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 81</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 82</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_is_ipv6?'>is_ipv6?</span><span class='lparen'>(</span><span class='id identifier rubyid_address'>address</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_address'>address</span> <span class='op'>=</span> <span class='id identifier rubyid_address'>address</span><span class='period'>.</span><span class='id identifier rubyid_ensure_string'>ensure_string</span>
@@ -1765,8 +1765,9 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Checks if we are running on MacOS X.
-System services are only available on that platform.</p>
+    <p>Checks if we are running on MacOS X.</p>
+
+<p>System services are only available on that platform.</p>
 
 
   </div>
@@ -1797,12 +1798,12 @@ System services are only available on that platform.</p>
       <pre class="lines">
 
 
-62
 63
-64</pre>
+64
+65</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 62</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 63</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_is_osx?'>is_osx?</span>
   <span class='op'>::</span><span class='const'>Config</span><span class='op'>::</span><span class='const'>CONFIG</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>host_os</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^darwin</span><span class='regexp_end'>/</span></span>
@@ -1875,12 +1876,12 @@ System services are only available on that platform.</p>
       <pre class="lines">
 
 
-119
 120
-121</pre>
+121
+122</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 119</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 120</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_launch_agent_path'>launch_agent_path</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>it.cowtech.akaer</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HOME</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/Library/LaunchAgents/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='rbrace'>}</span><span class='tstring_content'>.plist</span><span class='tstring_end'>&quot;</span></span>
@@ -1901,7 +1902,7 @@ System services are only available on that platform.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Adds or removes an alias from the interface</p>
+    <p>Adds or removes an alias from the interface.</p>
 
 
   </div>
@@ -1966,7 +1967,6 @@ System services are only available on that platform.</p>
       <pre class="lines">
 
 
-167
 168
 169
 170
@@ -1991,10 +1991,11 @@ System services are only available on that platform.</p>
 189
 190
 191
-192</pre>
+192
+193</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 167</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 168</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_manage'>manage</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_address'>address</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_rv'>rv</span> <span class='op'>=</span> <span class='kw'>true</span>
@@ -2105,12 +2106,12 @@ System services are only available on that platform.</p>
       <pre class="lines">
 
 
-104
 105
-106</pre>
+106
+107</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 104</span>
+      <pre class="code"><span class="info file"># File 'lib/akaer/application.rb', line 105</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pad_number'>pad_number</span><span class='lparen'>(</span><span class='id identifier rubyid_num'>num</span><span class='comma'>,</span> <span class='id identifier rubyid_len'>len</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_num'>num</span><span class='period'>.</span><span class='id identifier rubyid_to_integer'>to_integer</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='id identifier rubyid_len'>len</span><span class='period'>.</span><span class='id identifier rubyid_to_integer'>to_integer</span><span class='comma'>,</span> <span class='int'>2</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -2125,7 +2126,7 @@ System services are only available on that platform.</p>
 </div>
 
     <div id="footer">
-  Generated on Wed Aug 22 10:35:58 2012 by
+  Generated on Wed Aug 22 10:39:50 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

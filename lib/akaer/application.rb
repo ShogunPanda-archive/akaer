@@ -56,6 +56,7 @@ module Akaer
     end
 
     # Checks if we are running on MacOS X.
+    #
     # System services are only available on that platform.
     #
     # @return [Boolean] `true` if the current platform is MacOS X, `false` otherwise.
@@ -74,10 +75,10 @@ module Akaer
       rv = (mo && mo.captures.all? {|i| i.to_i < 256}) ? true : false
     end
 
-    # Checks if and address is a valid IPv4 address.
+    # Checks if and address is a valid IPv6 address.
     #
     # @param address [String] The address to check.
-    # @return [Boolean] `true` if the address is a valid IPv4 address, `false` otherwise.
+    # @return [Boolean] `true` if the address is a valid IPv6 address, `false` otherwise.
     def is_ipv6?(address)
       address = address.ensure_string
 
@@ -159,7 +160,7 @@ module Akaer
       rv
     end
 
-    # Adds or removes an alias from the interface
+    # Adds or removes an alias from the interface.
     #
     # @param type [Symbol] The operation to execute. Can be `:add` or `:remove`.
     # @param address [String] The address to manage.
