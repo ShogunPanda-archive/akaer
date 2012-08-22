@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    akaer (1.5.1)
+    akaer (1.5.2)
       mamertes (>= 1.1.0)
 
 GEM
