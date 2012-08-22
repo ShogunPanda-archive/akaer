@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.8.2.1
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><h1>akaer</h1>
+
+<p><a href="http://travis-ci.org/ShogunPanda/akaer"><img src="https://secure.travis-ci.org/ShogunPanda/akaer.png?branch=master" alt="Build Status"></a>
+<a href="https://gemnasium.com/ShogunPanda/akaer"><img src="https://gemnasium.com/ShogunPanda/akaer.png?travis" alt="Dependency Status"></a></p>
+
+<p>A small utility to add aliases to network interfaces.</p>
+
+<p><a href="http://github.com/ShogunPanda/akaer">http://github.com/ShogunPanda/akaer</a></p>
+
+<h2>Description</h2>
+
+<p>Akaer is a small utility that adds and removes aliases to your network interfaces. This is useful in web development.</p>
+
+<h2>Basic usage</h2>
+
+<ol>
+<li><p>Install the gem:</p>
+
+<pre class="code sh"><code>gem install akaer
+</code></pre></li>
+<li><p>Run the application:</p>
+
+<pre class="code sh"><code>akaer
+</code></pre></li>
+</ol>
+
+<p><strong>You&#39;re done!</strong></p>
+
+<h2>Advanced usage</h2>
+
+<p>Just type <code>akaer --help</code> and you&#39;ll see all available options.</p>
+
+<h2>Configuration</h2>
+
+<p>By defaults, Akaer uses a configuration file in <code>~/.akaer_config</code>, but you can change the path using the <code>--config</code> switch.</p>
+
+<p>The file is a plain Ruby file with a single <code>config</code> object that supports the following directives.</p>
+
+<ul>
+<li><code>interface</code>: The network interface to manage. <code>lo0</code> by default.</li>
+<li><code>addresses</code>: A specific list of aliases to manage.</li>
+<li><code>start_address</code>: The address to start sequential address. <code>10.0.0.1</code> by default. Not used if <code>addresses</code> is specified.</li>
+<li><code>aliases</code>: The number of sequential addresses to add. 5 by default.</li>
+<li><code>add_command</code>: The command to run for adding an alias. <code>sudo ifconfig @INTERFACE@ alias @ALIAS@</code> by default.</li>
+<li><code>remove_command</code>: The command to run for removing an alias. <code>sudo ifconfig @INTERFACE@ -alias @ALIAS@</code> by default.</li>
+<li><code>log_file</code>: The default log file. By default it logs to standard output.</li>
+<li><code>log_level</code>: The default log level. Valid values are from 0 to 5 where 0 means &quot;all messages&quot;.</li>
+<li><code>dry_run</code>: Only show which modifications will be done.</li>
+<li><code>quiet</code>: Do not show any message.</li>
+</ul>
+
+<h2>Contributing to akaer</h2>
+
+<ul>
+<li>Check out the latest master to make sure the feature hasn&#39;t been implemented or the bug hasn&#39;t been fixed yet.</li>
+<li>Check out the issue tracker to make sure someone already hasn&#39;t requested it and/or contributed it.</li>
+<li>Fork the project.</li>
+<li>Start a feature/bugfix branch.</li>
+<li>Commit and push until you are happy with your contribution.</li>
+<li>Make sure to add tests for it. This is important so I don&#39;t break it in a future version unintentionally.</li>
+<li>Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.</li>
+</ul>
+
+<h2>Copyright</h2>
+
+<p>Copyright (C) 2012 and above Shogun &lt;<a href="mailto:shogun_panda@me.com">shogun_panda@me.com</a>&gt;.
+Licensed under the MIT license, which can be found at <a href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a>.</p>
+</div></div>
+
+    <div id="footer">
+  Generated on Wed Aug 22 10:35:57 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.2.1 (ruby-1.9.2).
+</div>
+
+  </body>
+</html>
