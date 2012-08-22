@@ -4,7 +4,7 @@
 # Licensed under the MIT license, which can be found at http://www.opensource.org/licenses/mit-license.php.
 #
 
-require "bovem"
+require "mamertes"
 require "ipaddr"
 
 require "akaer/version" if !defined?(Akaer::Version)

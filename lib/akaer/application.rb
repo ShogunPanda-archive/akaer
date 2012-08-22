@@ -11,49 +11,44 @@ module Akaer
     # The {Configuration Configuration} of this application.
     attr_reader :config
 
-    # The arguments passed via command-line.
-    attr_reader :args
+    # The Mamertes command.
+    attr_reader :command
 
     # The logger for this application.
     attr_accessor :logger
 
     # Creates a new application.
     #
-    # @param globals [Hash] Global options.
-    # @param locals [Hash] Local command options.
-    # @param args [Array] Extra arguments.
-    def initialize(globals = {}, locals = {}, args = [])
-      @args = {
-        :global => globals,
-        :local => locals,
-        :args => args
-      }
+    # @param command [Mamertes::Command] The current Mamertes command.
+    def initialize(command)
+      @command = command
+      application = @command.application
 
       # Setup logger
       Bovem::Logger.start_time = Time.now
-      @logger = Bovem::Logger.create(Bovem::Logger.get_real_file(@args[:global][:log_file]) || Bovem::Logger.default_file, Logger::INFO)
+      @logger = Bovem::Logger.create(Bovem::Logger.get_real_file(application.options["log-file"].value) || Bovem::Logger.default_file, Logger::INFO)
 
       # Open configuration
       begin
         overrides = {
-          :interface => @args[:global][:interface],
-          :addresses => @args[:global][:addresses],
-          :start_address => @args[:global][:"start-address"],
-          :aliases => @args[:global][:aliases],
-          :add_command => @args[:global][:"add-command"],
-          :remove_command => @args[:global][:"remove-command"],
-          :log_file => @args[:global][:"log-file"],
-          :log_level => @args[:global][:"log-level"],
-          :dry_run => @args[:global][:"dry-run"],
-          :quiet => @args[:global][:quiet]
+          :interface => application.options["interface"].value,
+          :addresses => application.options["addresses"].value,
+          :start_address => application.options["start-address"].value,
+          :aliases => application.options["aliases"].value,
+          :add_command => application.options["add-command"].value,
+          :remove_command => application.options["remove-command"].value,
+          :log_file => application.options["log-file"].value,
+          :log_level => application.options["log-level"].value,
+          :dry_run => application.options["dry-run"].value,
+          :quiet => application.options["quiet"].value
         }.reject {|k,v| v.nil? }
 
-        @config = Akaer::Configuration.new(@args[:global][:config], overrides, @logger)
+        @config = Akaer::Configuration.new(application.options["configuration"].value, overrides, @logger)
 
         @logger = nil
         @logger = self.get_logger
       rescue Bovem::Errors::InvalidConfiguration => e
-        @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal("Cannot log to #{config.log_file}. Exiting...")
+        @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal("Cannot log to {mark=bright}#{config.log_file}{/mark}. Exiting...")
         raise ::SystemExit
       end
 
@@ -182,16 +177,15 @@ module Akaer
       @addresses ||= self.compute_addresses
       length = self.pad_number(@addresses.length)
       index = (@addresses.index(address) || 0) + 1
-      prefix = ["[".color(:cyan), self.pad_number(index, length.length).bright, "/".color(:cyan), length.bright, "]".color(:cyan)].join("")
+      prefix = "{mark=blue}[{mark=bright white}#{self.pad_number(index, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"
 
       # Now execute
       if !self.config.dry_run then
-        @logger.info("#{prefix} #{(type == :remove ? "Removing" : "Adding").bright} address #{address.bright} #{type != :remove ? "to" : "from"} interface #{self.config.interface.bright}...") if !self.config.quiet
+        @logger.info(@command.application.console.replace_markers("#{prefix} {mark=bright}#{(type == :remove ? "Removing" : "Adding")}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{self.config.interface}{/mark}...")) if !self.config.quiet
         rv = self.execute_command(command)
-
-        # TODO: The end badge.
+        @logger.error(@command.application.console.replace_markers("Cannot {mark=bright}#{(type == :remove ? "remove" : "add")}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{self.config.interface}{/mark}.")) if !rv
       else
-        @logger.info("#{prefix} I will #{(type == :remove ? "remove" : "add").bright} address #{address.bright} #{type != :remove ? "to" : "from"} interface #{self.config.interface.bright}.") if !self.config.quiet
+        @logger.info(@command.application.console.replace_markers("#{prefix} I will {mark=bright}#{(type == :remove ? "remove" : "add")}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{self.config.interface}{/mark}.")) if !self.config.quiet
       end
 
       rv
@@ -243,7 +237,7 @@ module Akaer
       launch_agent = self.launch_agent_path
 
       begin
-        logger.info("Creating the launch agent in #{launch_agent} ...") if !self.config.quiet
+        logger.info("Creating the launch agent in {mark=bright}#{launch_agent}{/mark} ...") if !self.config.quiet
 
         args = $ARGV ? $ARGV[0, $ARGV.length - 1] : []
 
@@ -302,14 +296,13 @@ module Akaer
     end
 
     # Returns a unique (singleton) instance of the application.
-    # @param globals [Hash] Global options.
-    # @param locals [Hash] Local command options.
-    # @param args [Array] Extra arguments.
+    #
+    # @param command [Mamertes::Command] The current Mamertes command.
     # @param force [Boolean] If to force recreation of the instance.
     # @return [Application] The unique (singleton) instance of the application.
-    def self.instance(globals = {}, locals = {}, args = [], force = false)
+    def self.instance(command, force = false)
       @instance = nil if force
-      @instance ||= Akaer::Application.new(globals, locals, args)
+      @instance ||= Akaer::Application.new(command)
     end
   end
 end

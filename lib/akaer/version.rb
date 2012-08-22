@@ -13,7 +13,7 @@ module Akaer
     MAJOR = 1
 
     # The minor version.
-    MINOR = 0
+    MINOR = 5
 
     # The patch version.
     PATCH = 0

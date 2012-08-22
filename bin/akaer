@@ -6,86 +6,45 @@
 
 require "rubygems"
 require "akaer"
-require "gli"
 
-include GLI
+Mamertes.App do
+  name "Akaer"
+  description "A small utility to add aliases to network interfaces."
+  version Akaer::Version::STRING
 
-program_desc("A small utility to add aliases to network interfaces.")
-version(Akaer::Version::STRING)
+  option "configuration", [], {:help => "The configuration file to use. Default is \"~/.akaer_config\".", :default => "~/.akaer_config"}
+  option "interface", [], {:help => "The default interface to manage. Default is \"lo0\".", :default => "lo0"}
+  option "addresses", [], {:type => Array, :help => "The default list of aliases to add. Overrides sequential list"}
+  option "start-address", [], {:help => "The starting address for sequential aliases. Default is \"10.0.0.1\".", :default => "10.0.0.1", :meta => "ADDRESS"}
+  option "aliases", [:S], {:type => Integer, :help => "The number of aliases to add. Default is 5.", :default => 5}
+  option "add-command", [:A], {:help => "The command to run for adding an alias. Default is \"sudo ifconfig @INTERFACE@ alias @ALIAS@\".", :default => "sudo ifconfig @INTERFACE@ alias @ALIAS@", :meta => "COMMAND"}
+  option "remove-command", [:R], {:help => "The command to run for removing an alias. Default is \"sudo ifconfig @INTERFACE@ -alias @ALIAS@\".", :default => "sudo ifconfig @INTERFACE@ -alias @ALIAS@", :meta => "COMMAND"}
+  option "log-file", [], {:help => "The default log file. Default is standard output.", :default => "STDOUT", :meta => "FILE"}
+  option "log-level", [:L], {:type => Integer, :help => "The default log level. Valid values are from 0 to 5 where 0 means \"all messages\". Default is 1.", :default => 1, :meta => "LEVEL"}
+  option "dry-run", [:n], {:help => "Only show which modifications will be done."}
+  option "quiet", [], {:help => "Do not show any message."}
 
-desc("The default interface to manage.")
-default_value("lo0")
-arg_name("INTERFACE")
-flag(:i, :interface)
+  command :add do
+    description "Adds aliases."
+    action { |command| Akaer::Application.instance(command).action_add() }
+  end
 
-desc("The default list of aliases to add.")
-default_value([])
-arg_name("ADDRESSES")
-flag(:A, :addresses)
+  command :remove do
+    description "Removes aliases."
+    action { |command| Akaer::Application.instance(command).action_remove() }
+  end
 
-desc("The starting address for sequential aliases.")
-default_value("10.0.0.1")
-arg_name("ADDRESS")
-flag(:s, :"start-address")
+  command :install do
+    description "Installs the application to autolaunch."
+    action { |command| Akaer::Application.instance(command).action_install() }
+  end
 
-desc("The number of aliases to add.")
-default_value(5)
-arg_name("ALIASES")
-flag(:S, :aliases)
+  command :uninstall do
+    description "Uninstalls the application from autolaunch."
+    action { |command| Akaer::Application.instance(command).action_uninstall() }
+  end
 
-desc("The command to run for adding an alias.")
-default_value("sudo ifconfig @INTERFACE@ alias @ALIAS@")
-arg_name("COMMAND")
-flag(:c, :"add-command")
-
-desc("The command to run for adding an alias.")
-default_value("sudo ifconfig @INTERFACE@ -alias @ALIAS@")
-arg_name("COMMAND")
-flag(:C, :"remove-command")
-
-desc("The default log file.")
-default_value("STDOUT")
-arg_name("LOG")
-flag([:l, :log])
-
-desc("The default log level. Valid values are from 0 to 5 where 0 means \"all messages\".")
-default_value(1)
-arg_name("LEVEL")
-flag([:L, :"log-level"])
-
-desc("Only show which modifications will be done")
-switch([:n, :"dry-run"])
-
-desc("Do not show any message.")
-switch([:q, :quiet])
-
-desc("Add aliases.")
-command [:a, :add] do |c|
-  c.action do |globals, locals, args|
-    Akaer::Application.instance(globals, locals, args).action_add()
+  action do |command|
+    self.commands["add"].execute(ARGV)
   end
 end
-
-desc("Remove aliases.")
-command [:r, :remove] do |c|
-  c.action do |globals, locals, args|
-    Akaer::Application.instance(globals, locals, args).action_remove()
-  end
-end
-
-desc("Install the application for autolaunch.")
-command [:i, :install] do |c|
-  c.action do |globals, locals, args|
-    Akaer::Application.instance(globals, locals, args).action_install()
-  end
-end
-
-desc("Uninstall the application from autolaunch.")
-command [:u, :uninstall] do |c|
-  c.action do |globals, locals, args|
-    Akaer::Application.instance(globals, locals, args).action_uninstall()
-  end
-end
-
-ARGV << "help" if ARGV.length == 0
-exit(GLI.run(ARGV))

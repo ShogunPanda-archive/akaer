@@ -7,12 +7,29 @@
 require "spec_helper"
 
 describe Akaer::Application do
+  def create_application(overrides)
+    mamertes_app = Mamertes::App(:run => false) do
+      option "configuration", [], {:default => overrides["configuration"] || "~/.akaer_config"}
+      option "interface", [], {:default => overrides["interface"] || "lo0"}
+      option "addresses", [], {:type => Array, :default => overrides["addresses"] || []}
+      option "start-address", [], {:default => overrides["start-address"] || "10.0.0.1"}
+      option "aliases", [:S], {:type => Integer, :default => overrides["aliases"] || 5}
+      option "add-command", [:A], {:default => overrides["add-command"] || "sudo ifconfig @INTERFACE@ alias @ALIAS@"}
+      option "remove-command", [:R], {:default => overrides["remove-command"] || "sudo ifconfig @INTERFACE@ -alias @ALIAS@"}
+      option "log-file", [], {:default => overrides["log-file"] || "STDOUT"}
+      option "log-level", [:L], {:type => Integer, :default => overrides["log-level"] || 1}
+      option "dry-run", [:n], {:default => overrides["dry-run"] || false}
+      option "quiet", [], {:default => overrides["quiet"] || false}
+    end
+
+    Akaer::Application.new(mamertes_app)
+  end
+
   before(:each) do
     Bovem::Logger.stub(:default_file).and_return("/dev/null")
   end
-
   let(:log_file) { "/dev/null" }
-  let(:application){ Akaer::Application.instance({:"log-file" => log_file}, true) }
+  let(:application){ create_application({"log-file" => log_file}) }
   let(:launch_agent_path) { "/tmp/akaer-test-agent-#{Time.now.strftime("%Y%m%d-%H%M%S")}" }
 
   describe "#initialize" do
@@ -30,7 +47,7 @@ describe Akaer::Application do
       file.write("config.aliases = ")
       file.close
 
-      expect { Akaer::Application.new({:config => file.path, :"log-file" => log_file}) }.to raise_error(::SystemExit)
+      expect { create_application({"configuration" => file.path, "log-file" => log_file}) }.to raise_error(::SystemExit)
       ::File.unlink(path)
     end
   end
@@ -94,7 +111,7 @@ describe Akaer::Application do
 
   describe "#compute_addresses" do
     describe "should use only the explicit list if given" do
-      let(:other_application){ Akaer::Application.new({:"log-file" => log_file, :addresses => ["10.0.0.1", "::1", "INVALID 1", "10.0.0.2", "INVALID 2", "2001:0db8:0::0:1428:57ab"]}) }
+      let(:other_application){ create_application({"log-file" => log_file, "addresses" => ["10.0.0.1", "::1", "INVALID 1", "10.0.0.2", "INVALID 2", "2001:0db8:0::0:1428:57ab"]}) }
 
       it "considering all address" do
         expect(other_application.compute_addresses).to eq(["10.0.0.1", "::1", "10.0.0.2", "2001:0db8:0::0:1428:57ab"])
@@ -102,28 +119,28 @@ describe Akaer::Application do
 
       it "considering only IPv4" do
         expect(other_application.compute_addresses(:ipv4)).to eq(["10.0.0.1", "10.0.0.2"])
-        expect(Akaer::Application.new({:"log-file" => log_file, :addresses => ["::1", "INVALID 1"]}).compute_addresses(:ipv4)).to eq([])
+        expect(create_application({"log-file" => log_file, "addresses" => ["::1", "INVALID 1"]}).compute_addresses(:ipv4)).to eq([])
       end
 
       it "considering only IPv6" do
         expect(other_application.compute_addresses(:ipv6)).to eq(["::1", "2001:0db8:0::0:1428:57ab"])
-        expect(Akaer::Application.new({:"log-file" => log_file, :addresses => ["10.0.0.1", "INVALID 1"]}).compute_addresses(:ipv6)).to eq([])
+        expect(create_application({"log-file" => log_file, "addresses" => ["10.0.0.1", "INVALID 1"]}).compute_addresses(:ipv6)).to eq([])
       end
     end
 
     describe "should compute a sequential list of address" do
       it "considering all address" do
-        expect(Akaer::Application.new({:"log-file" => log_file, :"start-address" => "10.0.1.1"}).compute_addresses).to eq(["10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.1.4", "10.0.1.5"])
-        expect(Akaer::Application.new({:"log-file" => log_file, :aliases => 3}).compute_addresses).to eq(["10.0.0.1", "10.0.0.2", "10.0.0.3"])
-        expect(Akaer::Application.new({:"log-file" => log_file, :"start-address" => "10.0.1.1", :aliases => -1}).compute_addresses).to eq(["10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.1.4", "10.0.1.5"])
+        expect(create_application({"log-file" => log_file, "start-address" => "10.0.1.1"}).compute_addresses).to eq(["10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.1.4", "10.0.1.5"])
+        expect(create_application({"log-file" => log_file, "aliases" => 3}).compute_addresses).to eq(["10.0.0.1", "10.0.0.2", "10.0.0.3"])
+        expect(create_application({"log-file" => log_file, "start-address" => "10.0.1.1", :aliases => -1}).compute_addresses).to eq(["10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.1.4", "10.0.1.5"])
       end
 
       it "considering only IPv4" do
-        expect(Akaer::Application.new({:"log-file" => log_file, :"start-address" => "::1"}).compute_addresses(:ipv4)).to eq([])
+        expect(create_application({"log-file" => log_file, "start-address" => "::1"}).compute_addresses(:ipv4)).to eq([])
       end
 
       it "considering only IPv6" do
-        expect(Akaer::Application.new({:"log-file" => log_file, :"start-address" => "10.0.0.1"}).compute_addresses(:ipv6)).to eq([])
+        expect(create_application({"log-file" => log_file, "start-address" => "10.0.0.1"}).compute_addresses(:ipv6)).to eq([])
       end
     end
   end
@@ -153,7 +170,7 @@ describe Akaer::Application do
     end
 
     it "should return true if the command succeded" do
-      other_application = Akaer::Application.new({:"add-command" => "echo @INTERFACE@", :quiet => true})
+      other_application = create_application({"add-command" => "echo @INTERFACE@", "quiet" => true})
       expect(other_application.manage(:add, "10.0.0.3")).to be_true
     end
 
@@ -162,7 +179,7 @@ describe Akaer::Application do
     end
 
     it "should respect dry-run mode" do
-      other_application = Akaer::Application.new({:"log-file" => log_file, :"dry-run" => true})
+      other_application = create_application({"log-file" => log_file, "dry-run" => true})
 
       other_application.logger.should_receive(:info).with(/.+.*03.*\/.*05.*.+ I will .*add.* address .*10.0.0.3.* to interface .*lo0.*/)
       other_application.should_not_receive(:execute_command)
@@ -173,7 +190,6 @@ describe Akaer::Application do
       other_application.manage(:remove, "10.0.0.3")
     end
   end
-
 
   describe "#action_add" do
     it("should compute addresses to manage") do
@@ -192,7 +208,7 @@ describe Akaer::Application do
 
     it("should show an error there's no address to manage") do
       application.stub(:compute_addresses).and_return([])
-      other_application = Akaer::Application.new({:"log-file" => log_file, :quiet => true})
+      other_application = create_application({"log-file" => log_file, "quiet" => true})
       other_application.stub(:compute_addresses).and_return([])
 
       application.logger.should_receive(:error).with("No valid addresses to add to the interface found.")
@@ -219,7 +235,7 @@ describe Akaer::Application do
 
     it("should show an error there's no address to manage") do
       application.stub(:compute_addresses).and_return([])
-      other_application = Akaer::Application.new({:"log-file" => log_file, :quiet => true})
+      other_application = create_application({"log-file" => log_file, "quiet" => true})
       other_application.stub(:compute_addresses).and_return([])
 
       application.logger.should_receive(:error).with("No valid addresses to remove from the interface found.")
