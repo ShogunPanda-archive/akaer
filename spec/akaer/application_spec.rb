@@ -9,14 +9,14 @@ require "spec_helper"
 describe Akaer::Application do
   def create_application(overrides)
     mamertes_app = Mamertes::App(:run => false) do
-      option "configuration", [], {:default => overrides["configuration"] || "~/.akaer_config"}
-      option "interface", [], {:default => overrides["interface"] || "lo0"}
+      option "configuration", [], {:type => String, :default => overrides["configuration"] || "~/.akaer_config"}
+      option "interface", [], {:type => String, :default => overrides["interface"] || "lo0"}
       option "addresses", [], {:type => Array, :default => overrides["addresses"] || []}
-      option "start-address", [], {:default => overrides["start-address"] || "10.0.0.1"}
+      option "start-address", [], {:type => String, :default => overrides["start-address"] || "10.0.0.1"}
       option "aliases", [:S], {:type => Integer, :default => overrides["aliases"] || 5}
-      option "add-command", [:A], {:default => overrides["add-command"] || "sudo ifconfig @INTERFACE@ alias @ALIAS@"}
-      option "remove-command", [:R], {:default => overrides["remove-command"] || "sudo ifconfig @INTERFACE@ -alias @ALIAS@"}
-      option "log-file", [], {:default => overrides["log-file"] || "STDOUT"}
+      option "add-command", [:A], {:type => String, :default => overrides["add-command"] || "sudo ifconfig @INTERFACE@ alias @ALIAS@"}
+      option "remove-command", [:R], {:type => String, :default => overrides["remove-command"] || "sudo ifconfig @INTERFACE@ -alias @ALIAS@"}
+      option "log-file", [], {:type => String, :default => overrides["log-file"] || "STDOUT"}
       option "log-level", [:L], {:type => Integer, :default => overrides["log-level"] || 1}
       option "dry-run", [:n], {:default => overrides["dry-run"] || false}
       option "quiet", [], {:default => overrides["quiet"] || false}
