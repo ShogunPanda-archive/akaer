@@ -9,20 +9,20 @@ require "spec_helper"
 describe Akaer::Application do
   def create_application(overrides)
     mamertes_app = Mamertes::App(:run => false) do
-      option "configuration", [], {:type => String, :default => overrides["configuration"] || "~/.akaer_config"}
+      option "configuration", [], {:type => String, :default => overrides["configuration"] || "/dev/null"}
       option "interface", [], {:type => String, :default => overrides["interface"] || "lo0"}
       option "addresses", [], {:type => Array, :default => overrides["addresses"] || []}
       option "start-address", [], {:type => String, :default => overrides["start-address"] || "10.0.0.1"}
       option "aliases", [:S], {:type => Integer, :default => overrides["aliases"] || 5}
       option "add-command", [:A], {:type => String, :default => overrides["add-command"] || "sudo ifconfig @INTERFACE@ alias @ALIAS@"}
       option "remove-command", [:R], {:type => String, :default => overrides["remove-command"] || "sudo ifconfig @INTERFACE@ -alias @ALIAS@"}
-      option "log-file", [], {:type => String, :default => overrides["log-file"] || "STDOUT"}
+      option "log-file", [], {:type => String, :default => overrides["log-file"] || "/dev/null"}
       option "log-level", [:L], {:type => Integer, :default => overrides["log-level"] || 1}
       option "dry-run", [:n], {:default => overrides["dry-run"] || false}
       option "quiet", [], {:default => overrides["quiet"] || false}
     end
 
-    Akaer::Application.new(mamertes_app)
+    ::Akaer::Application.new(mamertes_app)
   end
 
   before(:each) do
@@ -31,6 +31,25 @@ describe Akaer::Application do
   let(:log_file) { "/dev/null" }
   let(:application){ create_application({"log-file" => log_file}) }
   let(:launch_agent_path) { "/tmp/akaer-test-agent-#{Time.now.strftime("%Y%m%d-%H%M%S")}" }
+
+  describe ".instance" do
+    it("should call .new with the passed arguments") do
+      ::Akaer::Application.should_receive(:new).with("FOO")
+      ::Akaer::Application.instance("FOO")
+    end
+
+    it("should return the same instance") do
+      ::Akaer::Application.stub(:new) do Time.now end
+      instance = ::Akaer::Application.instance("start")
+      expect(::Akaer::Application.instance("stop")).to be(instance)
+    end
+
+    it("should return a new instance if requested to") do
+      ::Akaer::Application.stub(:new) do Time.now end
+      instance = ::Akaer::Application.instance("")
+      expect(::Akaer::Application.instance({"log-file" => "/dev/null"}, true)).not_to be(instance)
+    end
+  end
 
   describe "#initialize" do
     it("should setup the logger") do
