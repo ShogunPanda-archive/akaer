@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]
 
-  gem.add_dependency("mamertes", ">= 1.1.0")
+  gem.add_dependency("mamertes", ">= 1.1.7")
 
   gem.add_development_dependency("rspec", "~> 2.11.0")
   gem.add_development_dependency("rake", "~> 0.9.0")

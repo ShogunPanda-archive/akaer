@@ -252,16 +252,17 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/akaer/configuration.rb', line 45</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_overrides'>overrides</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='id identifier rubyid_logger'>logger</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span><span class='comma'>,</span> <span class='id identifier rubyid_overrides'>overrides</span><span class='comma'>,</span> <span class='id identifier rubyid_logger'>logger</span><span class='rparen'>)</span>
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_file identifier id'>file</span> <span class='assign token'>=</span> <span class='rubyid_nil nil kw'>nil</span><span class='comma token'>,</span> <span class='rubyid_overrides identifier id'>overrides</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span><span class='comma token'>,</span> <span class='rubyid_logger identifier id'>logger</span> <span class='assign token'>=</span> <span class='rubyid_nil nil kw'>nil</span><span class='rparen token'>)</span>
+  <span class='rubyid_super super kw'>super</span><span class='lparen token'>(</span><span class='rubyid_file identifier id'>file</span><span class='comma token'>,</span> <span class='rubyid_overrides identifier id'>overrides</span><span class='comma token'>,</span> <span class='rubyid_logger identifier id'>logger</span><span class='rparen token'>)</span>
 
-  <span class='comment'># Make sure some arguments are of correct type
-</span>  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_file'>log_file</span> <span class='op'>=</span> <span class='gvar'>$stdout</span> <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_file'>log_file</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>STDOUT</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_file'>log_file</span> <span class='op'>=</span> <span class='gvar'>$stderr</span> <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_file'>log_file</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>STDERR</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_addresses'>addresses</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_addresses'>addresses</span><span class='period'>.</span><span class='id identifier rubyid_ensure_array'>ensure_array</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_aliases'>aliases</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_aliases'>aliases</span><span class='period'>.</span><span class='id identifier rubyid_to_integer'>to_integer</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span><span class='period'>.</span><span class='id identifier rubyid_to_integer'>to_integer</span>
-<span class='kw'>end</span></pre>
+  <span class='comment val'># Make sure some arguments are of correct type</span>
+  <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_log_file identifier id'>log_file</span> <span class='assign token'>=</span> <span class='rubyid_$stdout gvar id'>$stdout</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_log_file identifier id'>log_file</span> <span class='eq op'>==</span> <span class='string val'>&quot;STDOUT&quot;</span>
+  <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_log_file identifier id'>log_file</span> <span class='assign token'>=</span> <span class='rubyid_$stderr gvar id'>$stderr</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_log_file identifier id'>log_file</span> <span class='eq op'>==</span> <span class='string val'>&quot;STDERR&quot;</span>
+  <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_addresses identifier id'>addresses</span> <span class='assign token'>=</span> <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_addresses identifier id'>addresses</span><span class='dot token'>.</span><span class='rubyid_ensure_array identifier id'>ensure_array</span>
+  <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_aliases identifier id'>aliases</span> <span class='assign token'>=</span> <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_aliases identifier id'>aliases</span><span class='dot token'>.</span><span class='rubyid_to_integer identifier id'>to_integer</span>
+  <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_log_level identifier id'>log_level</span> <span class='assign token'>=</span> <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_log_level identifier id'>log_level</span><span class='dot token'>.</span><span class='rubyid_to_integer identifier id'>to_integer</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -273,9 +274,9 @@
 </div>
 
     <div id="footer">
-  Generated on Wed Aug 22 10:39:51 2012 by
+  Generated on Sat Oct  6 08:55:20 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.2.1 (ruby-1.9.2).
+  0.8.2.1 (ruby-1.8.7).
 </div>
 
   </body>
