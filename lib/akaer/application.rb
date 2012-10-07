@@ -110,7 +110,7 @@ module Akaer
     #
     # @return [Logger] The current logger of the application.
     def get_logger
-      @logger ||= Bovem::Logger.create(Bovem::Logger.default_file, @config.log_level, @log_formatter)
+      @logger ||= Bovem::Logger.create(@config.log_file, @config.log_level, @log_formatter)
     end
 
     # Gets the path for the launch agent file.

@@ -16,7 +16,7 @@ module Akaer
     MINOR = 5
 
     # The patch version.
-    PATCH = 4
+    PATCH = 5
 
     # The current version of akaer.
     STRING = [MAJOR, MINOR, PATCH].compact.join(".")
