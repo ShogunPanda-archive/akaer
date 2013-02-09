@@ -186,11 +186,11 @@ module Akaer
 
       # Now execute
       if !config.dry_run then
-        @logger.info(@command.application.console.replace_markers("#{prefix} {mark=bright}#{(type == :remove ? "Removing" : "Adding")}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{config.interface}{/mark}...")) if !quiet
+        log_management(prefix, type, "Removing", "Adding", address, config, quiet)
         rv = self.execute_command(command)
         @logger.error(@command.application.console.replace_markers("Cannot {mark=bright}#{(type == :remove ? "remove" : "add")}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{config.interface}{/mark}.")) if !rv
       else
-        @logger.info(@command.application.console.replace_markers("#{prefix} I will {mark=bright}#{(type == :remove ? "remove" : "add")}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{config.interface}{/mark}.")) if !quiet
+        log_management(prefix, type, "remove", "add", address, config, quiet)
       end
 
       rv
@@ -200,32 +200,14 @@ module Akaer
     #
     # @return [Boolean] `true` if action succedeed, `false` otherwise.
     def action_add
-      addresses = self.compute_addresses
-
-      if addresses.present? then
-        # Now, for every address, call the command
-        addresses.all? {|address|
-          self.manage(:add, address)
-        }
-      else
-        @logger.error("No valid addresses to add to the interface found.") if !self.config.quiet
-      end
+      manage_action(:add, "No valid addresses to add to the interface found.", self.config.quiet)
     end
 
     # Removes aliases from the interface.
     #
     # @return [Boolean] `true` if action succedeed, `false` otherwise.
     def action_remove
-      addresses = self.compute_addresses
-
-      if addresses.present? then
-        # Now, for every address, call the command
-        addresses.all? {|address|
-          self.manage(:remove, address)
-        }
-      else
-        @logger.error("No valid addresses to remove from the interface found.") if !self.config.quiet
-      end
+      manage_action(:remove, "No valid addresses to remove from the interface found.", self.config.quiet)
     end
 
     # Installs the application into the autolaunch.
@@ -311,5 +293,37 @@ module Akaer
       @instance = nil if force
       @instance ||= Akaer::Application.new(command)
     end
+
+    private
+      # Logs an operation.
+      #
+      # @param prefix [String] The prefix to apply to the message.
+      # @param type [Symbol] The type of operation. Can be `:add` or `:remove`.
+      # @param remove_label [String] The label to use for removing.
+      # @param add_label [String] The label to use for adding.
+      # @param address [String] The address that will be managed.
+      # @param config [Configuration] The current configuration.
+      # @param quiet [Boolean] Whether to show the message.
+      def log_management(prefix, type, remove_label, add_label, address, config, quiet)
+        @logger.info(@command.application.console.replace_markers("#{prefix} I will {mark=bright}#{(type == :remove ? remove_label : add_label)}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{config.interface}{/mark}...")) if !quiet
+      end
+
+      # Manages an action on the request addresses.
+      #
+      # @param operation [Symbol] The type of operation. Can be `:add` or `:remove`.
+      # @param message [String] The message to show if no addresses are found.
+      # @param quiet [Boolean] Whether to show the failure message.
+      def manage_action(operation, message, quiet)
+        addresses = self.compute_addresses
+
+        if addresses.present? then
+          # Now, for every address, call the command
+          addresses.all? {|address|
+            self.manage(operation, address)
+          }
+        else
+          @logger.error(message) if !quiet
+        end
+      end
   end
 end
