@@ -5,6 +5,7 @@
 #
 
 require "mamertes"
+require "mustache"
 require "ipaddr"
 
 require "akaer/version" if !defined?(Akaer::Version)

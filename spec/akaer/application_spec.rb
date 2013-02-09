@@ -14,8 +14,8 @@ describe Akaer::Application do
       option :addresses, [], {type: Array, default: overrides["addresses"] || []}
       option :start_address, [], {type: String, default: overrides["start-address"] || "10.0.0.1"}
       option :aliases, [:S], {type: Integer, default: overrides["aliases"] || 5}
-      option :add_command, [:A], {type: String, default: overrides["add-command"] || "sudo ifconfig @INTERFACE@ alias @ALIAS@"}
-      option :remove_command, [:R], {type: String, default: overrides["remove-command"] || "sudo ifconfig @INTERFACE@ -alias @ALIAS@"}
+      option :add_command, [:A], {type: String, default: overrides["add-command"] || "sudo ifconfig {{interface}} alias {{alias}}"}
+      option :remove_command, [:R], {type: String, default: overrides["remove-command"] || "sudo ifconfig {{interface}} -alias {{alias}}"}
       option :log_file, [], {type: String, default: overrides["log-file"] || "/dev/null"}
       option :log_level, [:L], {type: Integer, default: overrides["log-level"] || 1}
       option :dry_run, [:n], {default: overrides["dry-run"] || false}
@@ -189,7 +189,7 @@ describe Akaer::Application do
     end
 
     it "should return true if the command succeded" do
-      other_application = create_application({"add-command" => "echo @INTERFACE@", "quiet" => true})
+      other_application = create_application({"add-command" => "echo {{interface}}", "quiet" => true})
       expect(other_application.manage(:add, "10.0.0.3")).to be_true
     end
 

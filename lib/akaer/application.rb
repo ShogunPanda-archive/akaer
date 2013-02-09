@@ -72,28 +72,14 @@ module Akaer
       #
       # @return [Boolean] `true` if action succedeed, `false` otherwise.
       def action_install
-        rv = true
-        launch_agent = self.launch_agent_path
-        quiet = self.config.quiet
-
-        rv = check_agent_available(quiet)
-        rv = create_agent(launch_agent, quiet) if rv
-        rv = load_agent(launch_agent, quiet) if rv
-        rv
+        manage_agent(self.launch_agent_path, :create_agent, :load_agent, self.config.quiet)
       end
 
       # Uninstalls the application from the autolaunch.
       #
       # @return [Boolean] `true` if action succedeed, `false` otherwise.
       def action_uninstall
-        rv = true
-        launch_agent = self.launch_agent_path
-        quiet = self.config.quiet
-
-        rv = check_agent_available(quiet)
-        rv = unload_agent(launch_agent, quiet) if rv
-        rv = delete_agent(launch_agent, quiet) if rv
-        rv
+        manage_agent(self.launch_agent_path, :unload_agent, :delete_agent, self.config.quiet)
       end
 
       private
@@ -106,7 +92,7 @@ module Akaer
           begin
             @addresses ||= self.compute_addresses
             length = self.pad_number(@addresses.length)
-            [true, config.send((type == :remove) ? :remove_command : :add_command).gsub("@INTERFACE@", config.interface).gsub("@ALIAS@", address) + " > /dev/null 2>&1", "{mark=blue}[{mark=bright white}#{self.pad_number((@addresses.index(address) || 0) + 1, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
+            [true, Mustache.render(config.send((type == :remove) ? :remove_command : :add_command), {interface: config.interface, alias: address}) + " > /dev/null 2>&1", "{mark=blue}[{mark=bright white}#{self.pad_number((@addresses.index(address) || 0) + 1, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
           rescue ArgumentError
             [false]
           end
@@ -143,6 +129,22 @@ module Akaer
           end
         end
 
+        # Manage a OSX agent.
+        #
+        # @param launch_agent [String] The agent path.
+        # @param first_operation [Symbol] The first operation to execute.
+        # @param second_operation [Symbol] The second operation to execute.
+        # @param quiet [Boolean] Whether to show messages.
+        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        def manage_agent(launch_agent, first_operation, second_operation, quiet)
+          rv = true
+
+          rv = check_agent_available(quiet)
+          rv = send(first_operation, launch_agent, quiet) if rv
+          rv = send(second_operation, launch_agent, quiet) if rv
+          rv
+        end
+
         # Check if agent is enabled (that is, we are on OSX).
         #
         # @param quiet [Boolean] Whether to show messages.
@@ -165,12 +167,8 @@ module Akaer
         def create_agent(launch_agent, quiet)
           begin
             self.logger.info("Creating the launch agent in {mark=bright}#{launch_agent}{/mark} ...") if !quiet
-
-            args = $ARGV ? $ARGV[0, $ARGV.length - 1] : []
-
-            plist = {"KeepAlive" => false, "Label" => "it.cowtech.akaer", "Program" => (::Pathname.new(Dir.pwd) + $0).to_s, "ProgramArguments" => args, "RunAtLoad" => true}
             ::File.open(launch_agent, "w") {|f|
-              f.write(plist.to_json)
+              f.write({"KeepAlive" => false, "Label" => "it.cowtech.akaer", "Program" => (::Pathname.new(Dir.pwd) + $0).to_s, "ProgramArguments" => ($ARGV ? $ARGV[0, $ARGV.length - 1] : []), "RunAtLoad" => true}.to_json)
               f.flush
             }
             self.execute_command("plutil -convert binary1 \"#{launch_agent}\"")

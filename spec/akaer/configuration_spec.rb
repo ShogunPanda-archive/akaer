@@ -14,8 +14,8 @@ describe Akaer::Configuration do
       expect(config.addresses).to eq([])
       expect(config.start_address).to eq("10.0.0.1")
       expect(config.aliases).to eq(5)
-      expect(config.add_command).to eq("sudo ifconfig @INTERFACE@ alias @ALIAS@")
-      expect(config.remove_command).to eq("sudo ifconfig @INTERFACE@ -alias @ALIAS@")
+      expect(config.add_command).to eq("sudo ifconfig {{interface}} alias {{alias}}")
+      expect(config.remove_command).to eq("sudo ifconfig {{interface}} -alias {{alias}}")
       expect(config.log_file).to eq($stdout)
       expect(config.log_level).to eq(Logger::INFO)
     end
