@@ -167,17 +167,23 @@ module Akaer
         def create_agent(launch_agent, quiet)
           begin
             self.logger.info("Creating the launch agent in {mark=bright}#{launch_agent}{/mark} ...") if !quiet
-            ::File.open(launch_agent, "w") {|f|
-              f.write({"KeepAlive" => false, "Label" => "it.cowtech.akaer", "Program" => (::Pathname.new(Dir.pwd) + $0).to_s, "ProgramArguments" => ($ARGV ? $ARGV[0, $ARGV.length - 1] : []), "RunAtLoad" => true}.to_json)
-              f.flush
-            }
+            write_agent(launch_agent)
             self.execute_command("plutil -convert binary1 \"#{launch_agent}\"")
-
             true
           rescue
             self.logger.error("Cannot create the launch agent.") if !quiet
             false
           end
+        end
+
+        # Writes a OSX system agent.
+        #
+        # @param launch_agent [String] The agent path.
+        def write_agent(launch_agent)
+          ::File.open(launch_agent, "w") {|f|
+            f.write({"KeepAlive" => false, "Label" => "it.cowtech.akaer", "Program" => (::Pathname.new(Dir.pwd) + $0).to_s, "ProgramArguments" => ($ARGV ? $ARGV[0, $ARGV.length - 1] : []), "RunAtLoad" => true}.to_json)
+            f.flush
+          }
         end
 
         # Deletes a OSX system agent.
