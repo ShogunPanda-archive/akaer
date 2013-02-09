@@ -17,8 +17,8 @@ module Akaer
 
   # Methods for the {Application Application} class.
   module ApplicationMethods
-    # System management methods.
-    module System
+    # General methods.
+    module General
       extend ActiveSupport::Concern
 
       # Checks if we are running on MacOS X.
@@ -44,9 +44,7 @@ module Akaer
         # Now execute
         if rv then
           if !config.dry_run then
-            log_management(:run, prefix, type, locale.removing, locale.adding, address, config, quiet)
-            rv = self.execute_command(command)
-            @logger.error(@command.application.console.replace_markers(locale.general_error(type == :remove ? locale.remove : locale.add, address, type != :remove ? locale.to : locale.from, config.interface))) if !rv
+            execute_manage(command, prefix, type, address, config, quiet)
           else
             log_management(:dry_run, prefix, type, locale.remove, locale.add, address, config, quiet)
           end
@@ -55,36 +53,8 @@ module Akaer
         rv
       end
 
-      # Adds aliases to the interface.
-      #
-      # @return [Boolean] `true` if action succedeed, `false` otherwise.
-      def action_add
-        manage_action(:add, self.i18n.add_empty, self.config.quiet)
-      end
-
-      # Removes aliases from the interface.
-      #
-      # @return [Boolean] `true` if action succedeed, `false` otherwise.
-      def action_remove
-        manage_action(:remove, self.i18n.remove_empty, self.config.quiet)
-      end
-
-      # Installs the application into the autolaunch.
-      #
-      # @return [Boolean] `true` if action succedeed, `false` otherwise.
-      def action_install
-        manage_agent(self.launch_agent_path, :create_agent, :load_agent, self.config.quiet)
-      end
-
-      # Uninstalls the application from the autolaunch.
-      #
-      # @return [Boolean] `true` if action succedeed, `false` otherwise.
-      def action_uninstall
-        manage_agent(self.launch_agent_path, :unload_agent, :delete_agent, self.config.quiet)
-      end
-
       private
-        # Setup management.
+        # Setups management.
         #
         # @param type [Symbol] The type of operation. Can be `:add` or `:remove`.
         # @param address [String] The address to manage.
@@ -97,6 +67,24 @@ module Akaer
           rescue ArgumentError
             [false]
           end
+        end
+
+        # Executes management.
+        #
+        # @param command [String] The command to execute.
+        # @param prefix [String] The prefix to apply to the message.
+        # @param type [Symbol] The type of operation. Can be `:add` or `:remove`.
+        # @param address [String] The address that will be managed.
+        # @param config [Configuration] The current configuration.
+        # @param quiet [Boolean] Whether to show the message.
+        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        def execute_manage(command, prefix, type, address, config, quiet)
+          locale = self.i18n
+          log_management(:run, prefix, type, locale.removing, locale.adding, address, config, quiet)
+          rv = self.execute_command(command)
+          labels = (type == :remove ? [locale.remove, locale.from] : [locale.add, locale.to])
+          @logger.error(@command.application.console.replace_markers(locale.general_error(labels[0], address, labels[1], config.interface))) if !rv
+          rv
         end
 
         # Logs an operation.
@@ -130,8 +118,40 @@ module Akaer
             @logger.error(message) if !quiet
           end
         end
+    end
 
-        # Manage a OSX agent.
+    # System management methods.
+    module System
+      # Adds aliases to the interface.
+      #
+      # @return [Boolean] `true` if action succedeed, `false` otherwise.
+      def action_add
+        manage_action(:add, self.i18n.add_empty, self.config.quiet)
+      end
+
+      # Removes aliases from the interface.
+      #
+      # @return [Boolean] `true` if action succedeed, `false` otherwise.
+      def action_remove
+        manage_action(:remove, self.i18n.remove_empty, self.config.quiet)
+      end
+
+      # Installs the application into the autolaunch.
+      #
+      # @return [Boolean] `true` if action succedeed, `false` otherwise.
+      def action_install
+        manage_agent(self.launch_agent_path, :create_agent, :load_agent, self.config.quiet)
+      end
+
+      # Uninstalls the application from the autolaunch.
+      #
+      # @return [Boolean] `true` if action succedeed, `false` otherwise.
+      def action_uninstall
+        manage_agent(self.launch_agent_path, :unload_agent, :delete_agent, self.config.quiet)
+      end
+
+      private
+        # Manages a OSX agent.
         #
         # @param launch_agent [String] The agent path.
         # @param first_operation [Symbol] The first operation to execute.
@@ -147,7 +167,7 @@ module Akaer
           rv
         end
 
-        # Check if agent is enabled (that is, we are on OSX).
+        # Checks if agent is enabled (that is, we are on OSX).
         #
         # @param quiet [Boolean] Whether to show messages.
         # @return [Boolean] `true` if the agent is enabled, `false` otherwise.
@@ -210,29 +230,38 @@ module Akaer
         # @return [Boolean] `true` if operation succedeed, `false` otherwise.
         def load_agent(launch_agent, quiet)
           begin
-            self.logger.info(self.i18n.agent_loading(launch_agent)) if !quiet
-            self.execute_command("launchctl load -w \"#{launch_agent}\" > /dev/null 2>&1")
-            true
+            perform_agent_loading(launch_agent, "load", :agent_loading, quiet)
           rescue
             self.logger.error(self.i18n.agent_loading_error) if !quiet
             false
           end
         end
 
-        # Unoads a OSX system agent.
+        # Unloads a OSX system agent.
         #
         # @param launch_agent [String] The agent path.
         # @param quiet [Boolean] Whether to show messages.
         # @return [Boolean] `true` if operation succedeed, `false` otherwise.
         def unload_agent(launch_agent, quiet)
           begin
-            self.logger.info(self.i18n.agent_unloading(launch_agent)) if !quiet
-            self.execute_command("launchctl unload -w \"#{launch_agent}\" > /dev/null 2>&1")
-            true
+            perform_agent_loading(launch_agent, "unload", :agent_unloading, quiet)
           rescue => e
             self.logger.warn(self.i18n.agent_unloading_error) if !quiet
             false
           end
+        end
+
+        # Performs operatoin on a OSX system agent.
+        #
+        # @param launch_agent [String] The agent path.
+        # @param command [String] The command to run.
+        # @param message [String] The message to show.
+        # @param quiet [Boolean] Whether to show messages.
+        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        def perform_agent_loading(launch_agent, command, message, quiet)
+          self.logger.info(self.i18n.send(message, launch_agent)) if !quiet
+          self.execute_command("launchctl #{command} -w \"#{launch_agent}\" > /dev/null 2>&1")
+          true
         end
     end
   end
@@ -243,6 +272,7 @@ module Akaer
     attr_accessor :logger
 
     include Lazier::I18n
+    include Akaer::ApplicationMethods::General
     include Akaer::ApplicationMethods::System
 
     # Creates a new application.
@@ -261,14 +291,7 @@ module Akaer
       @logger = Bovem::Logger.create(Bovem::Logger.get_real_file(options["log_file"]) || Bovem::Logger.default_file, Logger::INFO)
 
       # Open configuration
-      begin
-        @config = Akaer::Configuration.new(options["configuration"], options, @logger)
-        @logger = nil
-        @logger = self.get_logger
-      rescue Bovem::Errors::InvalidConfiguration => e
-        @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal(self.i18n.logging_failed(log_file))
-        raise ::SystemExit
-      end
+      read_configuration(options)
 
       self
     end
@@ -359,6 +382,20 @@ module Akaer
     end
 
     private
+      # Reads the configuration.
+      #
+      # @param options [Hash] The options to read.
+      def read_configuration(options)
+        begin
+          @config = Akaer::Configuration.new(options["configuration"], options, @logger)
+          @logger = nil
+          @logger = self.get_logger
+        rescue Bovem::Errors::InvalidConfiguration => e
+          @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal(self.i18n.logging_failed(log_file))
+          raise ::SystemExit
+        end
+      end
+
       # Filters a list of addresses to return just certain type(s).
       #
       # @param config [Configuration] The current configuration.
