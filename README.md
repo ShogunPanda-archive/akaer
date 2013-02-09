@@ -2,11 +2,13 @@
 
 [![Build Status](https://secure.travis-ci.org/ShogunPanda/akaer.png?branch=master)](http://travis-ci.org/ShogunPanda/akaer)
 [![Dependency Status](https://gemnasium.com/ShogunPanda/akaer.png?travis)](https://gemnasium.com/ShogunPanda/akaer)
-[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/ShogunPanda/akaer)
+[![Code Climate](https://codeclimate.com/github/ShogunPanda/akaer.png)](https://codeclimate.com/github/ShogunPanda/akaer)
 
 A small utility to add aliases to network interfaces.
 
-http://github.com/ShogunPanda/akaer
+http://sw.cow.tc/akaer
+
+http://rdoc.info/gems/akaer
 
 ## Description
 
@@ -61,5 +63,6 @@ The file is a plain Ruby file with a single `config` object that supports the fo
 
 ## Copyright
 
-Copyright (C) 2012 and above Shogun <[shogun_panda@me.com](mailto:shogun_panda@me.com)>.
-Licensed under the MIT license, which can be found at [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php).
+Copyright (C) 2013 and above Shogun (shogun_panda@me.com).
+
+Licensed under the MIT license, which can be found at http://www.opensource.org/licenses/mit-license.php.

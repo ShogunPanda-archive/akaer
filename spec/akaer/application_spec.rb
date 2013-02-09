@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# This file is part of the akaer gem. Copyright (C) 2012 and above Shogun <shogun_panda@me.com>.
+# This file is part of the akaer gem. Copyright (C) 2013 and above Shogun <shogun_panda@me.com>.
 # Licensed under the MIT license, which can be found at http://www.opensource.org/licenses/mit-license.php.
 #
 
@@ -8,18 +8,18 @@ require "spec_helper"
 
 describe Akaer::Application do
   def create_application(overrides)
-    mamertes_app = Mamertes::App(:run => false) do
-      option "configuration", [], {:type => String, :default => overrides["configuration"] || "/dev/null"}
-      option "interface", [], {:type => String, :default => overrides["interface"] || "lo0"}
-      option "addresses", [], {:type => Array, :default => overrides["addresses"] || []}
-      option "start-address", [], {:type => String, :default => overrides["start-address"] || "10.0.0.1"}
-      option "aliases", [:S], {:type => Integer, :default => overrides["aliases"] || 5}
-      option "add-command", [:A], {:type => String, :default => overrides["add-command"] || "sudo ifconfig @INTERFACE@ alias @ALIAS@"}
-      option "remove-command", [:R], {:type => String, :default => overrides["remove-command"] || "sudo ifconfig @INTERFACE@ -alias @ALIAS@"}
-      option "log-file", [], {:type => String, :default => overrides["log-file"] || "/dev/null"}
-      option "log-level", [:L], {:type => Integer, :default => overrides["log-level"] || 1}
-      option "dry-run", [:n], {:default => overrides["dry-run"] || false}
-      option "quiet", [], {:default => overrides["quiet"] || false}
+    mamertes_app = Mamertes::App(run: false) do
+      option "configuration", [], {type: String, default: overrides["configuration"] || "/dev/null"}
+      option "interface", [], {type: String, default: overrides["interface"] || "lo0"}
+      option "addresses", [], {type: Array, default: overrides["addresses"] || []}
+      option "start-address", [], {type: String, default: overrides["start-address"] || "10.0.0.1"}
+      option "aliases", [:S], {type: Integer, default: overrides["aliases"] || 5}
+      option "add-command", [:A], {type: String, default: overrides["add-command"] || "sudo ifconfig @INTERFACE@ alias @ALIAS@"}
+      option "remove-command", [:R], {type: String, default: overrides["remove-command"] || "sudo ifconfig @INTERFACE@ -alias @ALIAS@"}
+      option "log-file", [], {type: String, default: overrides["log-file"] || "/dev/null"}
+      option "log-level", [:L], {type: Integer, default: overrides["log-level"] || 1}
+      option "dry-run", [:n], {default: overrides["dry-run"] || false}
+      option "quiet", [], {default: overrides["quiet"] || false}
     end
 
     ::Akaer::Application.new(mamertes_app)
@@ -151,7 +151,7 @@ describe Akaer::Application do
       it "considering all address" do
         expect(create_application({"log-file" => log_file, "start-address" => "10.0.1.1"}).compute_addresses).to eq(["10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.1.4", "10.0.1.5"])
         expect(create_application({"log-file" => log_file, "aliases" => 3}).compute_addresses).to eq(["10.0.0.1", "10.0.0.2", "10.0.0.3"])
-        expect(create_application({"log-file" => log_file, "start-address" => "10.0.1.1", :aliases => -1}).compute_addresses).to eq(["10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.1.4", "10.0.1.5"])
+        expect(create_application({"log-file" => log_file, "start-address" => "10.0.1.1", aliases: -1}).compute_addresses).to eq(["10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.1.4", "10.0.1.5"])
       end
 
       it "considering only IPv4" do
@@ -265,7 +265,7 @@ describe Akaer::Application do
   end
 
   describe "#action_install" do
-    if ::Config::CONFIG['host_os'] =~ /^darwin/ then
+    if ::RbConfig::CONFIG['host_os'] =~ /^darwin/ then
       it "should create the agent" do
         application.stub(:launch_agent_path).and_return(launch_agent_path)
         ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
@@ -306,7 +306,7 @@ describe Akaer::Application do
   end
 
   describe "#action_uninstall" do
-    if ::Config::CONFIG['host_os'] =~ /^darwin/ then
+    if ::RbConfig::CONFIG['host_os'] =~ /^darwin/ then
       it "should remove the agent" do
         application.stub(:launch_agent_path).and_return(launch_agent_path)
         ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
