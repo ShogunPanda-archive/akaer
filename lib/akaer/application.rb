@@ -72,76 +72,29 @@ module Akaer
       #
       # @return [Boolean] `true` if action succedeed, `false` otherwise.
       def action_install
-        logger = get_logger
+        rv = true
+        launch_agent = self.launch_agent_path
         quiet = self.config.quiet
 
-        if !self.is_osx? then
-          logger.fatal("Install akaer on autolaunch is only available on MacOSX.") if !quiet
-          return false
-        end
-
-        launch_agent = self.launch_agent_path
-
-        begin
-          logger.info("Creating the launch agent in {mark=bright}#{launch_agent}{/mark} ...") if !quiet
-
-          args = $ARGV ? $ARGV[0, $ARGV.length - 1] : []
-
-          plist = {"KeepAlive" => false, "Label" => "it.cowtech.akaer", "Program" => (::Pathname.new(Dir.pwd) + $0).to_s, "ProgramArguments" => args, "RunAtLoad" => true}
-          ::File.open(launch_agent, "w") {|f|
-            f.write(plist.to_json)
-            f.flush
-          }
-          self.execute_command("plutil -convert binary1 \"#{launch_agent}\"")
-        rescue => e
-          logger.error("Cannot create the launch agent.") if !quiet
-          return false
-        end
-
-        begin
-          logger.info("Loading the launch agent ...") if !quiet
-          self.execute_command("launchctl load -w \"#{launch_agent}\" > /dev/null 2>&1")
-        rescue => e
-          logger.error("Cannot load the launch agent.") if !quiet
-          return false
-        end
-
-        true
+        rv = check_agent_available(quiet)
+        rv = create_agent(launch_agent, quiet) if rv
+        rv = load_agent(launch_agent, quiet) if rv
+        rv
       end
 
       # Uninstalls the application from the autolaunch.
       #
       # @return [Boolean] `true` if action succedeed, `false` otherwise.
       def action_uninstall
-        logger = self.get_logger
+        rv = true
+        launch_agent = self.launch_agent_path
         quiet = self.config.quiet
 
-        if !self.is_osx? then
-          logger.fatal("Install akaer on autolaunch is only available on MacOSX.") if !quiet
-          return false
-        end
-
-        launch_agent = self.launch_agent_path
-
-        # Unload the launch agent.
-        begin
-          self.execute_command("launchctl unload -w \"#{launch_agent}\" > /dev/null 2>&1")
-        rescue => e
-          logger.warn("Cannot unload the launch agent.") if !quiet
-        end
-
-        # Delete the launch agent.
-        begin
-          logger.info("Deleting the launch agent #{launch_agent} ...")
-          ::File.delete(launch_agent)
-        rescue => e
-          logger.warn("Cannot delete the launch agent.") if !quiet
-          return false
-        end
-
-        true
+        rv = check_agent_available(quiet)
+        rv = unload_agent(launch_agent, quiet) if rv
+        rv = delete_agent(launch_agent, quiet) if rv
+        rv
       end
-
 
       private
         # Setup management.
@@ -153,9 +106,7 @@ module Akaer
           begin
             @addresses ||= self.compute_addresses
             length = self.pad_number(@addresses.length)
-            index = (@addresses.index(address) || 0) + 1
-
-            [true, config.send((type == :remove) ? :remove_command : :add_command).gsub("@INTERFACE@", config.interface).gsub("@ALIAS@", address) + " > /dev/null 2>&1", "{mark=blue}[{mark=bright white}#{self.pad_number(index, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
+            [true, config.send((type == :remove) ? :remove_command : :add_command).gsub("@INTERFACE@", config.interface).gsub("@ALIAS@", address) + " > /dev/null 2>&1", "{mark=blue}[{mark=bright white}#{self.pad_number((@addresses.index(address) || 0) + 1, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
           rescue ArgumentError
             [false]
           end
@@ -191,6 +142,91 @@ module Akaer
             @logger.error(message) if !quiet
           end
         end
+
+        # Check if agent is enabled (that is, we are on OSX).
+        #
+        # @param quiet [Boolean] Whether to show messages.
+        # @return [Boolean] `true` if the agent is enabled, `false` otherwise.
+        def check_agent_available(quiet)
+          rv = true
+          if !self.is_osx? then
+            logger.fatal("Install akaer on autolaunch is only available on MacOSX.") if !quiet
+            rv = false
+          end
+
+          rv
+        end
+
+        # Creates a OSX system agent.
+        #
+        # @param launch_agent [String] The agent path.
+        # @param quiet [Boolean] Whether to show messages.
+        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        def create_agent(launch_agent, quiet)
+          begin
+            self.logger.info("Creating the launch agent in {mark=bright}#{launch_agent}{/mark} ...") if !quiet
+
+            args = $ARGV ? $ARGV[0, $ARGV.length - 1] : []
+
+            plist = {"KeepAlive" => false, "Label" => "it.cowtech.akaer", "Program" => (::Pathname.new(Dir.pwd) + $0).to_s, "ProgramArguments" => args, "RunAtLoad" => true}
+            ::File.open(launch_agent, "w") {|f|
+              f.write(plist.to_json)
+              f.flush
+            }
+            self.execute_command("plutil -convert binary1 \"#{launch_agent}\"")
+
+            true
+          rescue
+            self.logger.error("Cannot create the launch agent.") if !quiet
+            false
+          end
+        end
+
+        # Deletes a OSX system agent.
+        #
+        # @param launch_agent [String] The agent path.
+        # @param quiet [Boolean] Whether to show messages.
+        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        def delete_agent(launch_agent, quiet)
+          begin
+            self.logger.info("Deleting the launch agent #{launch_agent} ...") if !quiet
+            ::File.delete(launch_agent)
+          rescue => e
+            self.logger.warn("Cannot delete the launch agent.") if !quiet
+            return false
+          end
+        end
+
+        # Loads a OSX system agent.
+        #
+        # @param launch_agent [String] The agent path.
+        # @param quiet [Boolean] Whether to show messages.
+        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        def load_agent(launch_agent, quiet)
+          begin
+            self.logger.info("Loading the launch agent ...") if !quiet
+            self.execute_command("launchctl load -w \"#{launch_agent}\" > /dev/null 2>&1")
+            true
+          rescue
+            self.logger.error("Cannot load the launch agent.") if !quiet
+            false
+          end
+        end
+
+        # Unoads a OSX system agent.
+        #
+        # @param launch_agent [String] The agent path.
+        # @param quiet [Boolean] Whether to show messages.
+        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        def unload_agent(launch_agent, quiet)
+          begin
+            self.execute_command("launchctl unload -w \"#{launch_agent}\" > /dev/null 2>&1")
+            true
+          rescue => e
+            self.logger.warn("Cannot unload the launch agent.") if !quiet
+            false
+          end
+        end
     end
   end
 
@@ -206,19 +242,19 @@ module Akaer
     # @param command [Mamertes::Command] The current Mamertes command.
     def initialize(command)
       @command = command
-      application = @command.application
+      options = @command.application.get_options.reject {|k,v| v.nil? }
 
       # Setup logger
       Bovem::Logger.start_time = Time.now
-      @logger = Bovem::Logger.create(Bovem::Logger.get_real_file(application.options["log_file"].value) || Bovem::Logger.default_file, Logger::INFO)
+      @logger = Bovem::Logger.create(Bovem::Logger.get_real_file(options["log_file"]) || Bovem::Logger.default_file, Logger::INFO)
 
       # Open configuration
       begin
-        @config = Akaer::Configuration.new(application.options["configuration"].value, application.get_options.reject {|k,v| v.nil? }, @logger)
+        @config = Akaer::Configuration.new(options["configuration"], options, @logger)
         @logger = nil
         @logger = self.get_logger
       rescue Bovem::Errors::InvalidConfiguration => e
-        @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal("Cannot log to {mark=bright}#{config.log_file}{/mark}. Exiting...")
+        @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal("Cannot log to {mark=bright}#{log_file}{/mark}. Exiting...")
         raise ::SystemExit
       end
 
@@ -331,7 +367,7 @@ module Akaer
       def generate_addresses(config, type)
         begin
           ip = IPAddr.new(config.start_address.ensure_string)
-          raise ArgumentError if (type == :ipv4 && !ip.ipv4?) || (type == :ipv6 && !ip.ipv6?)
+          raise ArgumentError if type != :all && !ip.send("#{type}?")
 
           (config.aliases > 0 ? config.aliases : 5).times.collect {|i|
             current = ip
