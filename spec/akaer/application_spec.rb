@@ -22,7 +22,7 @@ describe Akaer::Application do
       option :quiet, [], {default: overrides["quiet"] || false}
     end
 
-    ::Akaer::Application.new(mamertes_app)
+    ::Akaer::Application.new(mamertes_app, :en)
   end
 
   before(:each) do
@@ -34,8 +34,8 @@ describe Akaer::Application do
 
   describe ".instance" do
     it("should call .new with the passed arguments") do
-      ::Akaer::Application.should_receive(:new).with("FOO")
-      ::Akaer::Application.instance("FOO")
+      ::Akaer::Application.should_receive(:new).with("FOO", :es)
+      ::Akaer::Application.instance("FOO", :es)
     end
 
     it("should return the same instance") do
@@ -47,7 +47,7 @@ describe Akaer::Application do
     it("should return a new instance if requested to") do
       ::Akaer::Application.stub(:new) do Time.now end
       instance = ::Akaer::Application.instance("")
-      expect(::Akaer::Application.instance({"log-file" => "/dev/null"}, true)).not_to be(instance)
+      expect(::Akaer::Application.instance({"log-file" => "/dev/null"}, nil, true)).not_to be(instance)
     end
   end
 

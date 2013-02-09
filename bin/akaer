@@ -8,39 +8,41 @@ require "rubygems"
 require "akaer"
 
 Mamertes.App do
+  localizer = Lazier::Localizer.new(:akaer, ::File.absolute_path(::Pathname.new(::File.dirname(__FILE__)).to_s + "/../locales/")).i18n
+
   name "Akaer"
-  description "A small utility to add aliases to network interfaces."
+  description localizer.application_description
   version Akaer::Version::STRING
 
-  option :configuration, [], {:type => String, :help => "The configuration file to use. Default is \"~/.akaer_config\".", :default => "~/.akaer_config", :meta => "FILE"}
-  option :interface, [], {:type => String, :help => "The default interface to manage. Default is \"lo0\".", :default => "lo0"}
-  option :addresses, [], {:type => Array, :help => "The default list of aliases to add. Overrides sequential list"}
-  option :start_address, [:S, "start-address"], {:type => String, :help => "The starting address for sequential aliases. Default is \"10.0.0.1\".", :default => "10.0.0.1", :meta => "ADDRESS"}
-  option :aliases, [:S], {:type => Integer, :help => "The number of aliases to add. Default is 5.", :default => 5}
-  option :add_command, [:A, "add-command"], {:type => String, :help => "The command to run for adding an alias. Default is \"sudo ifconfig @INTERFACE@ alias @ALIAS@\".", :default => "sudo ifconfig @INTERFACE@ alias @ALIAS@", :meta => "COMMAND"}
-  option :remove_command, [:R, "remove-command"], {:type => String, :help => "The command to run for removing an alias. Default is \"sudo ifconfig @INTERFACE@ -alias @ALIAS@\".", :default => "sudo ifconfig @INTERFACE@ -alias @ALIAS@", :meta => "COMMAND"}
-  option :log_file, [:l, "log-file"], {:type => String, :help => "The default log file. Default is standard output.", :default => "STDOUT", :meta => "FILE"}
-  option :log_level, [:L, "log-level"], {:type => Integer, :help => "The default log level. Valid values are from 0 to 5 where 0 means \"all messages\". Default is 1.", :default => 1, :meta => "LEVEL"}
-  option :dry_run, [:n, "dry-run"], {:help => "Only show which modifications will be done."}
-  option :quiet, [], {:help => "Do not show any message."}
+  option :configuration, [], {type: String, help: localizer.application_help_configuration, default: "~/.akaer_config", meta: localizer.application_meta_file}
+  option :interface, [], {type: String, help: localizer.application_help_interface, default: "lo0", meta: localizer.application_meta_interface}
+  option :addresses, [], {type: Array, help: localizer.application_help_addresses, meta: localizer.application_meta_addresses}
+  option :start_address, [:s, "start-address"], {type: String, help: localizer.application_help_start_address, default: "10.0.0.1", meta: localizer.application_meta_address}
+  option :aliases, [:S], {type: Integer, help: localizer.application_help_aliases, default: 5, meta: localizer.application_meta_aliases}
+  option :add_command, [:A, "add-command"], {type: String, help: localizer.application_help_add_command, default: "sudo ifconfig @INTERFACE@ alias @ALIAS@", meta: localizer.application_meta_command}
+  option :remove_command, [:R, "remove-command"], {type: String, help: localizer.application_help_remove_command, default: "sudo ifconfig @INTERFACE@ -alias @ALIAS@", meta: localizer.application_meta_command}
+  option :log_file, [:l, "log-file"], {type: String, help: localizer.application_help_log_file, default: "STDOUT", meta: localizer.application_meta_file}
+  option :log_level, [:L, "log-level"], {type: Integer, help: localizer.application_help_log_level, default: 1, meta: localizer.application_meta_level}
+  option :dry_run, [:n, "dry-run"], {help: localizer.application_help_dry_run}
+  option :quiet, [], {help: localizer.application_help_quiet}
 
   command :add do
-    description "Adds aliases."
+    description localizer.application_command_add
     action { |command| Akaer::Application.instance(command).action_add() }
   end
 
   command :remove do
-    description "Removes aliases."
+    description localizer.application_command_remove
     action { |command| Akaer::Application.instance(command).action_remove() }
   end
 
   command :install do
-    description "Installs the application to autolaunch."
+    description localizer.application_command_install
     action { |command| Akaer::Application.instance(command).action_install() }
   end
 
   command :uninstall do
-    description "Uninstalls the application from autolaunch."
+    description localizer.application_command_uninstall
     action { |command| Akaer::Application.instance(command).action_uninstall() }
   end
 

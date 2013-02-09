@@ -36,6 +36,7 @@ module Akaer
       # @param address [String] The address to manage.
       # @return [Boolean] `true` if operation succedeed, `false` otherwise.
       def manage(type, address)
+        locale = self.i18n
         config = self.config
         quiet = config.quiet
         rv, command, prefix = setup_management(type, address)
@@ -43,11 +44,11 @@ module Akaer
         # Now execute
         if rv then
           if !config.dry_run then
-            log_management(prefix, type, "Removing", "Adding", address, config, quiet)
+            log_management(:run, prefix, type, locale.removing, locale.adding, address, config, quiet)
             rv = self.execute_command(command)
-            @logger.error(@command.application.console.replace_markers("Cannot {mark=bright}#{(type == :remove ? "remove" : "add")}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{config.interface}{/mark}.")) if !rv
+            @logger.error(@command.application.console.replace_markers(locale.general_error(type == :remove ? locale.remove : locale.add, address, type != :remove ? locale.to : locale.from, config.interface))) if !rv
           else
-            log_management(prefix, type, "remove", "add", address, config, quiet)
+            log_management(:dry_run, prefix, type, locale.remove, locale.add, address, config, quiet)
           end
         end
 
@@ -58,14 +59,14 @@ module Akaer
       #
       # @return [Boolean] `true` if action succedeed, `false` otherwise.
       def action_add
-        manage_action(:add, "No valid addresses to add to the interface found.", self.config.quiet)
+        manage_action(:add, self.i18n.add_empty, self.config.quiet)
       end
 
       # Removes aliases from the interface.
       #
       # @return [Boolean] `true` if action succedeed, `false` otherwise.
       def action_remove
-        manage_action(:remove, "No valid addresses to remove from the interface found.", self.config.quiet)
+        manage_action(:remove, self.i18n.remove_empty, self.config.quiet)
       end
 
       # Installs the application into the autolaunch.
@@ -100,6 +101,7 @@ module Akaer
 
         # Logs an operation.
         #
+        # @param message [Symbol] The message to print.
         # @param prefix [String] The prefix to apply to the message.
         # @param type [Symbol] The type of operation. Can be `:add` or `:remove`.
         # @param remove_label [String] The label to use for removing.
@@ -107,8 +109,8 @@ module Akaer
         # @param address [String] The address that will be managed.
         # @param config [Configuration] The current configuration.
         # @param quiet [Boolean] Whether to show the message.
-        def log_management(prefix, type, remove_label, add_label, address, config, quiet)
-          @logger.info(@command.application.console.replace_markers("#{prefix} I will {mark=bright}#{(type == :remove ? remove_label : add_label)}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{config.interface}{/mark}...")) if !quiet
+        def log_management(message, prefix, type, remove_label, add_label, address, config, quiet)
+          @logger.info(@command.application.console.replace_markers(self.i18n.send(message, prefix, type == :remove ? remove_label : add_label, address, type != :remove ? self.i18n.to : self.i18n.from, config.interface))) if !quiet
         end
 
         # Manages an action on the request addresses.
@@ -152,7 +154,7 @@ module Akaer
         def check_agent_available(quiet)
           rv = true
           if !self.is_osx? then
-            logger.fatal("Install akaer on autolaunch is only available on MacOSX.") if !quiet
+            logger.fatal(self.i18n.no_agent) if !quiet
             rv = false
           end
 
@@ -166,12 +168,12 @@ module Akaer
         # @return [Boolean] `true` if operation succedeed, `false` otherwise.
         def create_agent(launch_agent, quiet)
           begin
-            self.logger.info("Creating the launch agent in {mark=bright}#{launch_agent}{/mark} ...") if !quiet
+            self.logger.info(self.i18n.agent_creating(launch_agent)) if !quiet
             write_agent(launch_agent)
             self.execute_command("plutil -convert binary1 \"#{launch_agent}\"")
             true
           rescue
-            self.logger.error("Cannot create the launch agent.") if !quiet
+            self.logger.error(self.i18n.agent_creating_error) if !quiet
             false
           end
         end
@@ -193,10 +195,10 @@ module Akaer
         # @return [Boolean] `true` if operation succedeed, `false` otherwise.
         def delete_agent(launch_agent, quiet)
           begin
-            self.logger.info("Deleting the launch agent #{launch_agent} ...") if !quiet
+            self.logger.info(self.i18n.agent_deleting(launch_agent)) if !quiet
             ::File.delete(launch_agent)
           rescue => e
-            self.logger.warn("Cannot delete the launch agent.") if !quiet
+            self.logger.warn(self.i18n.agent_deleting_error) if !quiet
             return false
           end
         end
@@ -208,11 +210,11 @@ module Akaer
         # @return [Boolean] `true` if operation succedeed, `false` otherwise.
         def load_agent(launch_agent, quiet)
           begin
-            self.logger.info("Loading the launch agent ...") if !quiet
+            self.logger.info(self.i18n.agent_loading(launch_agent)) if !quiet
             self.execute_command("launchctl load -w \"#{launch_agent}\" > /dev/null 2>&1")
             true
           rescue
-            self.logger.error("Cannot load the launch agent.") if !quiet
+            self.logger.error(self.i18n.agent_loading_error) if !quiet
             false
           end
         end
@@ -224,10 +226,11 @@ module Akaer
         # @return [Boolean] `true` if operation succedeed, `false` otherwise.
         def unload_agent(launch_agent, quiet)
           begin
+            self.logger.info(self.i18n.agent_unloading(launch_agent)) if !quiet
             self.execute_command("launchctl unload -w \"#{launch_agent}\" > /dev/null 2>&1")
             true
           rescue => e
-            self.logger.warn("Cannot unload the launch agent.") if !quiet
+            self.logger.warn(self.i18n.agent_unloading_error) if !quiet
             false
           end
         end
@@ -239,12 +242,17 @@ module Akaer
     attr_reader :command
     attr_accessor :logger
 
+    include Lazier::I18n
     include Akaer::ApplicationMethods::System
 
     # Creates a new application.
     #
     # @param command [Mamertes::Command] The current Mamertes command.
-    def initialize(command)
+    # @param locale [Symbol] The locale to use for the application.
+    def initialize(command, locale)
+      self.i18n_setup(:akaer, ::File.absolute_path(::Pathname.new(::File.dirname(__FILE__)).to_s + "/../../locales/"))
+      self.i18n = locale
+
       @command = command
       options = @command.application.get_options.reject {|k,v| v.nil? }
 
@@ -258,7 +266,7 @@ module Akaer
         @logger = nil
         @logger = self.get_logger
       rescue Bovem::Errors::InvalidConfiguration => e
-        @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal("Cannot log to {mark=bright}#{log_file}{/mark}. Exiting...")
+        @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal(self.i18n.logging_failed(log_file))
         raise ::SystemExit
       end
 
@@ -342,11 +350,12 @@ module Akaer
     # Returns a unique (singleton) instance of the application.
     #
     # @param command [Mamertes::Command] The current Mamertes command.
+    # @param locale [Symbol] The locale to use for the application.
     # @param force [Boolean] If to force recreation of the instance.
     # @return [Application] The unique (singleton) instance of the application.
-    def self.instance(command, force = false)
+    def self.instance(command, locale = nil, force = false)
       @instance = nil if force
-      @instance ||= Akaer::Application.new(command)
+      @instance ||= Akaer::Application.new(command, locale)
     end
 
     private
