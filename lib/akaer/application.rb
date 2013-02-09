@@ -36,19 +36,19 @@ module Akaer
       # @param address [String] The address to manage.
       # @return [Boolean] `true` if operation succedeed, `false` otherwise.
       def manage(type, address)
-        rv = true
         config = self.config
         quiet = config.quiet
-
-        command, length, index, prefix = setup_management(type, address)
+        rv, command, prefix = setup_management(type, address)
 
         # Now execute
-        if !config.dry_run then
-          log_management(prefix, type, "Removing", "Adding", address, config, quiet)
-          rv = self.execute_command(command)
-          @logger.error(@command.application.console.replace_markers("Cannot {mark=bright}#{(type == :remove ? "remove" : "add")}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{config.interface}{/mark}.")) if !rv
-        else
-          log_management(prefix, type, "remove", "add", address, config, quiet)
+        if rv then
+          if !config.dry_run then
+            log_management(prefix, type, "Removing", "Adding", address, config, quiet)
+            rv = self.execute_command(command)
+            @logger.error(@command.application.console.replace_markers("Cannot {mark=bright}#{(type == :remove ? "remove" : "add")}{/mark} address {mark=bright}#{address}{/mark} #{type != :remove ? "to" : "from"} interface {mark=bright}#{config.interface}{/mark}.")) if !rv
+          else
+            log_management(prefix, type, "remove", "add", address, config, quiet)
+          end
         end
 
         rv
@@ -150,16 +150,15 @@ module Akaer
         # @param address [String] The address to manage.
         # @return [Array] A list of parameters for the management.
         def setup_management(type, address)
-          # Compute the command
-          command = config.send((type == :remove) ? :remove_command : :add_command).gsub("@INTERFACE@", config.interface).gsub("@ALIAS@", address) + " > /dev/null 2>&1"
+          begin
+            @addresses ||= self.compute_addresses
+            length = self.pad_number(@addresses.length)
+            index = (@addresses.index(address) || 0) + 1
 
-          # Compute the prefix
-          @addresses ||= self.compute_addresses
-          length = self.pad_number(@addresses.length)
-          index = (@addresses.index(address) || 0) + 1
-          prefix = "{mark=blue}[{mark=bright white}#{self.pad_number(index, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"
-
-          [command, length, index, prefix]
+            [true, config.send((type == :remove) ? :remove_command : :add_command).gsub("@INTERFACE@", config.interface).gsub("@ALIAS@", address) + " > /dev/null 2>&1", "{mark=blue}[{mark=bright white}#{self.pad_number(index, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
+          rescue ArgumentError
+            [false]
+          end
         end
 
         # Logs an operation.
@@ -211,25 +210,11 @@ module Akaer
 
       # Setup logger
       Bovem::Logger.start_time = Time.now
-      @logger = Bovem::Logger.create(Bovem::Logger.get_real_file(application.options["log-file"].value) || Bovem::Logger.default_file, Logger::INFO)
+      @logger = Bovem::Logger.create(Bovem::Logger.get_real_file(application.options["log_file"].value) || Bovem::Logger.default_file, Logger::INFO)
 
       # Open configuration
       begin
-        overrides = {
-          interface: application.options["interface"].value,
-          addresses: application.options["addresses"].value,
-          start_address: application.options["start-address"].value,
-          aliases: application.options["aliases"].value,
-          add_command: application.options["add-command"].value,
-          remove_command: application.options["remove-command"].value,
-          log_file: application.options["log-file"].value,
-          log_level: application.options["log-level"].value,
-          dry_run: application.options["dry-run"].value,
-          quiet: application.options["quiet"].value
-        }.reject {|k,v| v.nil? }
-
-        @config = Akaer::Configuration.new(application.options["configuration"].value, overrides, @logger)
-
+        @config = Akaer::Configuration.new(application.options["configuration"].value, application.get_options.reject {|k,v| v.nil? }, @logger)
         @logger = nil
         @logger = self.get_logger
       rescue Bovem::Errors::InvalidConfiguration => e
@@ -310,31 +295,8 @@ module Akaer
     # @param type [Symbol] The type of addresses to consider. Valid values are `:ipv4`, `:ipv6`, otherwise all addresses are considered.
     # @return [Array] The list of addresses to add or remove from the interface.
     def compute_addresses(type = :all)
-      rv = []
       config = self.config
-
-      if config.addresses.present? # We have an explicit list
-        rv = config.addresses
-
-        # Now filter the addresses
-        filters = [type != :ipv6 ? :ipv4 : nil, type != :ipv4 ? :ipv6 : nil].compact
-        rv = rv.select {|address|
-          filters.any? {|filter| self.send("is_#{filter}?", address) }
-        }.compact.uniq
-      else
-        begin
-          ip = IPAddr.new(config.start_address.ensure_string)
-          raise ArgumentError if (type == :ipv4 && !ip.ipv4?) || (type == :ipv6 && !ip.ipv6?)
-
-          (config.aliases > 0 ? config.aliases : 5).times do
-            rv << ip.to_s
-            ip = ip.succ
-          end
-        rescue ArgumentError
-        end
-      end
-
-      rv
+      config.addresses.present? ? filter_addresses(config, type) : generate_addresses(config, type)
     end
 
     # Returns a unique (singleton) instance of the application.
@@ -346,5 +308,39 @@ module Akaer
       @instance = nil if force
       @instance ||= Akaer::Application.new(command)
     end
+
+    private
+      # Filters a list of addresses to return just certain type(s).
+      #
+      # @param config [Configuration] The current configuration.
+      # @param type [Symbol] The type of addresses to return.
+      # @return [Array] A list of IPs.
+      def filter_addresses(config, type)
+        filters =  [:ipv4, :ipv6].select {|i| type == i || type == :all }.compact
+
+        rv = config.addresses.select { |address|
+          filters.any? {|filter| self.send("is_#{filter}?", address) }
+        }.compact.uniq
+      end
+
+      # Generates a list of addresses which are immediate successors of a start address.
+      #
+      # @param config [Configuration] The current configuration.
+      # @param type [Symbol] The type of addresses to return.
+      # @return [Array] A list of IPs.
+      def generate_addresses(config, type)
+        begin
+          ip = IPAddr.new(config.start_address.ensure_string)
+          raise ArgumentError if (type == :ipv4 && !ip.ipv4?) || (type == :ipv6 && !ip.ipv6?)
+
+          (config.aliases > 0 ? config.aliases : 5).times.collect {|i|
+            current = ip
+            ip = ip.succ
+            current
+          }
+        rescue ArgumentError
+          []
+        end
+      end
   end
 end
