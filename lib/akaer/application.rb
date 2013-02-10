@@ -89,6 +89,7 @@ module Akaer
         # @param config [Configuration] The current configuration.
         # @param quiet [Boolean] Whether to show the message.
         def log_management(message, prefix, type, remove_label, add_label, address, config, quiet)
+          locale = self.i18n
           labels = (type == :remove ? [remove_label, locale.from] : [add_label, locale.to])
           @logger.info(@command.application.console.replace_markers(self.i18n.send(message, prefix, labels[0], address, labels[1], config.interface))) if !quiet
         end
