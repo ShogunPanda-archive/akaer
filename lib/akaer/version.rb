@@ -10,13 +10,13 @@ module Akaer
   # @see http://semver.org
   module Version
     # The major version.
-    MAJOR = 1
+    MAJOR = 2
 
     # The minor version.
-    MINOR = 5
+    MINOR = 0
 
     # The patch version.
-    PATCH = 8
+    PATCH = 0
 
     # The current version of akaer.
     STRING = [MAJOR, MINOR, PATCH].compact.join(".")

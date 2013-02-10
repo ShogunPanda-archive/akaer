@@ -6,15 +6,6 @@
 
 # A small utility to add aliases to network interfaces.
 module Akaer
-  # The main Akaer application.
-  #
-  # @attribute config
-  #   @return [Configuration] The {Configuration Configuration} of this application.
-  # @attribute command
-  #   @return [Mamertes::Command] The Mamertes command.
-  # @attribute
-  #   @return [Bovem::Logger] logger The logger for this application.
-
   # Methods for the {Application Application} class.
   module ApplicationMethods
     # General methods.
@@ -98,7 +89,8 @@ module Akaer
         # @param config [Configuration] The current configuration.
         # @param quiet [Boolean] Whether to show the message.
         def log_management(message, prefix, type, remove_label, add_label, address, config, quiet)
-          @logger.info(@command.application.console.replace_markers(self.i18n.send(message, prefix, type == :remove ? remove_label : add_label, address, type != :remove ? self.i18n.to : self.i18n.from, config.interface))) if !quiet
+          labels = (type == :remove ? [remove_label, locale.from] : [add_label, locale.to])
+          @logger.info(@command.application.console.replace_markers(self.i18n.send(message, prefix, labels[0], address, labels[1], config.interface))) if !quiet
         end
 
         # Manages an action on the request addresses.
@@ -266,6 +258,14 @@ module Akaer
     end
   end
 
+  # The main Akaer application.
+  #
+  # @attribute config
+  #   @return [Configuration] The {Configuration Configuration} of this application.
+  # @attribute command
+  #   @return [Mamertes::Command] The Mamertes command.
+  # @attribute
+  #   @return [Bovem::Logger] logger The logger for this application.
   class Application
     attr_reader :config
     attr_reader :command

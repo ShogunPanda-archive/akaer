@@ -300,7 +300,7 @@ describe Akaer::Application do
 
     it "should raise an exception if not running on OSX" do
       application.stub(:is_osx?).and_return(false)
-      application.logger.should_receive(:fatal).with("Install akaer on autolaunch is only available on MacOSX.")
+      application.logger.should_receive(:fatal).with("Installing akaer on autolaunch is only available on MacOSX.")
       expect(application.action_install).to be_false
     end
   end
@@ -349,7 +349,7 @@ describe Akaer::Application do
 
     it "should raise an exception if not running on OSX" do
       application.stub(:is_osx?).and_return(false)
-      application.logger.should_receive(:fatal).with("Install akaer on autolaunch is only available on MacOSX.")
+      application.logger.should_receive(:fatal).with("Installing akaer on autolaunch is only available on MacOSX.")
       expect(application.action_uninstall).to be_false
     end
   end

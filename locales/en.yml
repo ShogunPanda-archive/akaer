@@ -17,7 +17,7 @@
     remove_empty: "No valid addresses to remove from the interface found."
     run: "%1 {mark=bright}%2{/mark} address {mark=bright}%3{/mark} %4interface {mark=bright}%5{/mark}..."
     dry_run: "%1 I will {mark=bright}%2{/mark} address {mark=bright}%3{/mark} %4interface {mark=bright}%5{/mark}..."
-    no_agent: "Install akaer on autolaunch is only available on MacOSX."
+    no_agent: "Installing akaer on autolaunch is only available on MacOSX."
     agent_creating: "Creating the launch agent in {mark=bright}%1{/mark} ..."
     agent_creating_error: "Cannot create the launch agent."
     agent_deleting: "Deleting the launch agent %1 ..."
