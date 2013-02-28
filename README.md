@@ -1,7 +1,8 @@
 # akaer 
 
-[![Build Status](https://secure.travis-ci.org/ShogunPanda/akaer.png?branch=master)](http://travis-ci.org/ShogunPanda/akaer)
+[![Gem Version](https://badge.fury.io/rb/akaer.png)](http://badge.fury.io/rb/akaer)
 [![Dependency Status](https://gemnasium.com/ShogunPanda/akaer.png?travis)](https://gemnasium.com/ShogunPanda/akaer)
+[![Build Status](https://secure.travis-ci.org/ShogunPanda/akaer.png?branch=master)](http://travis-ci.org/ShogunPanda/akaer)
 [![Code Climate](https://codeclimate.com/github/ShogunPanda/akaer.png)](https://codeclimate.com/github/ShogunPanda/akaer)
 
 A small utility to add aliases to network interfaces.
