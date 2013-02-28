@@ -19,11 +19,11 @@ module Akaer
     # The number of aliases to add. Default: `5`.
     property :aliases, default: 5
 
-    # The command to run for adding an alias. Default: `sudo ifconfig {{interface}} alias {{alias}}`.
-    property :add_command, default: "sudo ifconfig {{interface}} alias {{alias}}"
+    # The command to run for adding an alias. Default: `sudo ifconfig {{interface}} alias {{address}}`.
+    property :add_command, default: "sudo ifconfig {{interface}} alias {{address}}"
 
-    # The command to run for removing an alias. Default: `sudo ifconfig {{interface}} alias {{alias}}`.
-    property :remove_command, default: "sudo ifconfig {{interface}} -alias {{alias}}"
+    # The command to run for removing an alias. Default: `sudo ifconfig {{interface}} alias {{address}}`.
+    property :remove_command, default: "sudo ifconfig {{interface}} -alias {{address}}"
 
     # The file to log to. Default is the standard output.
     property :log_file, default: "STDOUT"

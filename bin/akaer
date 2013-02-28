@@ -19,8 +19,8 @@ Mamertes.App do
   option :addresses, [], {type: Array, help: localizer.application_help_addresses, meta: localizer.application_meta_addresses}
   option :start_address, [:s, "start-address"], {type: String, help: localizer.application_help_start_address, default: "10.0.0.1", meta: localizer.application_meta_address}
   option :aliases, [:S], {type: Integer, help: localizer.application_help_aliases, default: 5, meta: localizer.application_meta_aliases}
-  option :add_command, [:A, "add-command"], {type: String, help: localizer.application_help_add_command, default: "sudo ifconfig @INTERFACE@ alias @ALIAS@", meta: localizer.application_meta_command}
-  option :remove_command, [:R, "remove-command"], {type: String, help: localizer.application_help_remove_command, default: "sudo ifconfig @INTERFACE@ -alias @ALIAS@", meta: localizer.application_meta_command}
+  option :add_command, [:A, "add-command"], {type: String, help: localizer.application_help_add_command, default: "sudo ifconfig {{interface}} alias {{address}}", meta: localizer.application_meta_command}
+  option :remove_command, [:R, "remove-command"], {type: String, help: localizer.application_help_remove_command, default: "sudo ifconfig {{interface}} -alias {{address}}", meta: localizer.application_meta_command}
   option :log_file, [:l, "log-file"], {type: String, help: localizer.application_help_log_file, default: "STDOUT", meta: localizer.application_meta_file}
   option :log_level, [:L, "log-level"], {type: Integer, help: localizer.application_help_log_level, default: 1, meta: localizer.application_meta_level}
   option :dry_run, [:n, "dry-run"], {help: localizer.application_help_dry_run}
@@ -47,6 +47,6 @@ Mamertes.App do
   end
 
   action do |command|
-    self.commands["add"].execute()
+    self.commands["add"].execute([])
   end
 end

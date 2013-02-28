@@ -6,7 +6,7 @@
 <title>
   File: README
   
-    &mdash; Documentation by YARD 0.8.4.1
+    &mdash; Documentation by YARD 0.8.5.2
   
 </title>
 
@@ -63,8 +63,9 @@
 
     <div id="content"><div id='filecontents'><h1 id="akaer">akaer</h1>
 
-<p><a href="http://travis-ci.org/ShogunPanda/akaer"><img src="https://secure.travis-ci.org/ShogunPanda/akaer.png?branch=master" alt="Build Status" /></a>
+<p><a href="http://badge.fury.io/rb/akaer"><img src="https://badge.fury.io/rb/akaer.png" alt="Gem Version" /></a>
 <a href="https://gemnasium.com/ShogunPanda/akaer"><img src="https://gemnasium.com/ShogunPanda/akaer.png?travis" alt="Dependency Status" /></a>
+<a href="http://travis-ci.org/ShogunPanda/akaer"><img src="https://secure.travis-ci.org/ShogunPanda/akaer.png?branch=master" alt="Build Status" /></a>
 <a href="https://codeclimate.com/github/ShogunPanda/akaer"><img src="https://codeclimate.com/github/ShogunPanda/akaer.png" alt="Code Climate" /></a></p>
 
 <p>A small utility to add aliases to network interfaces.</p>
@@ -115,8 +116,8 @@
   <li><code>addresses</code>: A specific list of aliases to manage.</li>
   <li><code>start_address</code>: The address to start sequential address. <code>10.0.0.1</code> by default. Not used if <code>addresses</code> is specified.</li>
   <li><code>aliases</code>: The number of sequential addresses to add. 5 by default.</li>
-  <li><code>add_command</code>: The command to run for adding an alias. <code>sudo ifconfig @INTERFACE@ alias @ALIAS@</code> by default.</li>
-  <li><code>remove_command</code>: The command to run for removing an alias. <code>sudo ifconfig @INTERFACE@ -alias @ALIAS@</code> by default.</li>
+  <li><code>add_command</code>: The command to run for adding an alias. <code>sudo ifconfig {{interface}} alias {{address}}</code> by default.</li>
+  <li><code>remove_command</code>: The command to run for removing an alias. <code>sudo ifconfig {{interface}} -alias {{address}}</code> by default.</li>
   <li><code>log_file</code>: The default log file. By default it logs to standard output.</li>
   <li><code>log_level</code>: The default log level. Valid values are from 0 to 5 where 0 means &#8220;all messages&#8221;.</li>
   <li><code>dry_run</code>: Only show which modifications will be done.</li>
@@ -143,9 +144,9 @@
 </div></div>
 
     <div id="footer">
-  Generated on Sat Feb  9 17:30:33 2013 by
+  Generated on Thu Feb 28 08:11:08 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.4.1 (ruby-1.9.3).
+  0.8.5.2 (ruby-1.9.3).
 </div>
 
   </body>

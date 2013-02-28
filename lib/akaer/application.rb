@@ -25,7 +25,7 @@ module Akaer
       #
       # @param type [Symbol] The operation to execute. Can be `:add` or `:remove`.
       # @param address [String] The address to manage.
-      # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+      # @return [Boolean] `true` if operation succeeded, `false` otherwise.
       def manage(type, address)
         locale = self.i18n
         config = self.config
@@ -54,7 +54,7 @@ module Akaer
           begin
             @addresses ||= self.compute_addresses
             length = self.pad_number(@addresses.length)
-            [true, Mustache.render(config.send((type == :remove) ? :remove_command : :add_command), {interface: config.interface, alias: address}) + " > /dev/null 2>&1", "{mark=blue}[{mark=bright white}#{self.pad_number((@addresses.index(address) || 0) + 1, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
+            [true, Mustache.render(config.send((type == :remove) ? :remove_command : :add_command), {interface: config.interface, address: address.to_s}) + " > /dev/null 2>&1", "{mark=blue}[{mark=bright white}#{self.pad_number((@addresses.index(address) || 0) + 1, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
           rescue ArgumentError
             [false]
           end
@@ -68,7 +68,7 @@ module Akaer
         # @param address [String] The address that will be managed.
         # @param config [Configuration] The current configuration.
         # @param quiet [Boolean] Whether to show the message.
-        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def execute_manage(command, prefix, type, address, config, quiet)
           locale = self.i18n
           log_management(:run, prefix, type, locale.removing, locale.adding, address, config, quiet)
@@ -117,28 +117,28 @@ module Akaer
     module System
       # Adds aliases to the interface.
       #
-      # @return [Boolean] `true` if action succedeed, `false` otherwise.
+      # @return [Boolean] `true` if action succeeded, `false` otherwise.
       def action_add
         manage_action(:add, self.i18n.add_empty, self.config.quiet)
       end
 
       # Removes aliases from the interface.
       #
-      # @return [Boolean] `true` if action succedeed, `false` otherwise.
+      # @return [Boolean] `true` if action succeeded, `false` otherwise.
       def action_remove
         manage_action(:remove, self.i18n.remove_empty, self.config.quiet)
       end
 
       # Installs the application into the autolaunch.
       #
-      # @return [Boolean] `true` if action succedeed, `false` otherwise.
+      # @return [Boolean] `true` if action succeeded, `false` otherwise.
       def action_install
         manage_agent(self.launch_agent_path, :create_agent, :load_agent, self.config.quiet)
       end
 
       # Uninstalls the application from the autolaunch.
       #
-      # @return [Boolean] `true` if action succedeed, `false` otherwise.
+      # @return [Boolean] `true` if action succeeded, `false` otherwise.
       def action_uninstall
         manage_agent(self.launch_agent_path, :unload_agent, :delete_agent, self.config.quiet)
       end
@@ -150,7 +150,7 @@ module Akaer
         # @param first_operation [Symbol] The first operation to execute.
         # @param second_operation [Symbol] The second operation to execute.
         # @param quiet [Boolean] Whether to show messages.
-        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def manage_agent(launch_agent, first_operation, second_operation, quiet)
           rv = true
 
@@ -178,7 +178,7 @@ module Akaer
         #
         # @param launch_agent [String] The agent path.
         # @param quiet [Boolean] Whether to show messages.
-        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def create_agent(launch_agent, quiet)
           begin
             self.logger.info(self.i18n.agent_creating(launch_agent)) if !quiet
@@ -205,7 +205,7 @@ module Akaer
         #
         # @param launch_agent [String] The agent path.
         # @param quiet [Boolean] Whether to show messages.
-        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def delete_agent(launch_agent, quiet)
           begin
             self.logger.info(self.i18n.agent_deleting(launch_agent)) if !quiet
@@ -220,7 +220,7 @@ module Akaer
         #
         # @param launch_agent [String] The agent path.
         # @param quiet [Boolean] Whether to show messages.
-        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def load_agent(launch_agent, quiet)
           begin
             perform_agent_loading(launch_agent, "load", :agent_loading, quiet)
@@ -234,7 +234,7 @@ module Akaer
         #
         # @param launch_agent [String] The agent path.
         # @param quiet [Boolean] Whether to show messages.
-        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def unload_agent(launch_agent, quiet)
           begin
             perform_agent_loading(launch_agent, "unload", :agent_unloading, quiet)
@@ -250,7 +250,7 @@ module Akaer
         # @param command [String] The command to run.
         # @param message [String] The message to show.
         # @param quiet [Boolean] Whether to show messages.
-        # @return [Boolean] `true` if operation succedeed, `false` otherwise.
+        # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def perform_agent_loading(launch_agent, command, message, quiet)
           self.logger.info(self.i18n.send(message, launch_agent)) if !quiet
           self.execute_command("launchctl #{command} -w \"#{launch_agent}\" > /dev/null 2>&1")
