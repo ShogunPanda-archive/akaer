@@ -5,7 +5,7 @@
 #
 
 module Akaer
-  # This class holds the configuration of the applicaton.
+  # This class holds the configuration of the application.
   class Configuration < Bovem::Configuration
     # The default interface to manage. Default: `lo0`.
     property :interface, default: "lo0"

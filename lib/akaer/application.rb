@@ -152,8 +152,6 @@ module Akaer
         # @param quiet [Boolean] Whether to show messages.
         # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def manage_agent(launch_agent, first_operation, second_operation, quiet)
-          rv = true
-
           rv = check_agent_available(quiet)
           rv = send(first_operation, launch_agent, quiet) if rv
           rv = send(second_operation, launch_agent, quiet) if rv
@@ -196,7 +194,7 @@ module Akaer
         # @param launch_agent [String] The agent path.
         def write_agent(launch_agent)
           ::File.open(launch_agent, "w") {|f|
-            f.write({"KeepAlive" => false, "Label" => "it.cowtech.akaer", "Program" => (::Pathname.new(Dir.pwd) + $0).to_s, "ProgramArguments" => ($ARGV ? $ARGV[0, $ARGV.length - 1] : []), "RunAtLoad" => true}.to_json)
+            f.write({"KeepAlive" => false, "Label" => "it.cowtech.akaer", "Program" => (::Pathname.new(Dir.pwd) + $0).to_s, "ProgramArguments" => (ARGV ? ARGV[0, ARGV.length - 1] : []), "RunAtLoad" => true}.to_json)
             f.flush
           }
         end
@@ -210,7 +208,7 @@ module Akaer
           begin
             self.logger.info(self.i18n.agent_deleting(launch_agent)) if !quiet
             ::File.delete(launch_agent)
-          rescue => e
+          rescue => _
             self.logger.warn(self.i18n.agent_deleting_error) if !quiet
             return false
           end
@@ -238,13 +236,13 @@ module Akaer
         def unload_agent(launch_agent, quiet)
           begin
             perform_agent_loading(launch_agent, "unload", :agent_unloading, quiet)
-          rescue => e
+          rescue => _
             self.logger.warn(self.i18n.agent_unloading_error) if !quiet
             false
           end
         end
 
-        # Performs operatoin on a OSX system agent.
+        # Performs operation on a OSX system agent.
         #
         # @param launch_agent [String] The agent path.
         # @param command [String] The command to run.
@@ -285,7 +283,7 @@ module Akaer
       self.i18n = locale
 
       @command = command
-      options = @command.application.get_options.reject {|k,v| v.nil? }
+      options = @command.application.get_options.reject {|_, v| v.nil? }
 
       # Setup logger
       Bovem::Logger.start_time = Time.now
@@ -305,7 +303,7 @@ module Akaer
       address = address.ensure_string
 
       mo = /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\Z/.match(address)
-      rv = (mo && mo.captures.all? {|i| i.to_i < 256}) ? true : false
+      (mo && mo.captures.all? {|i| i.to_i < 256}) ? true : false
     end
 
     # Checks if and address is a valid IPv6 address.
@@ -315,7 +313,7 @@ module Akaer
     def is_ipv6?(address)
       address = address.ensure_string
 
-      rv = catch(:valid) do
+      catch(:valid) do
         # IPv6 (normal)
         throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*\Z/ =~ address
         throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*)?\Z/ =~ address
@@ -405,7 +403,7 @@ module Akaer
       def filter_addresses(config, type)
         filters =  [:ipv4, :ipv6].select {|i| type == i || type == :all }.compact
 
-        rv = config.addresses.select { |address|
+        config.addresses.select { |address|
           filters.any? {|filter| self.send("is_#{filter}?", address) }
         }.compact.uniq
       end
@@ -420,7 +418,7 @@ module Akaer
           ip = IPAddr.new(config.start_address.ensure_string)
           raise ArgumentError if type != :all && !ip.send("#{type}?")
 
-          (config.aliases > 0 ? config.aliases : 5).times.collect {|i|
+          (config.aliases > 0 ? config.aliases : 5).times.collect {|_|
             current = ip
             ip = ip.succ
             current
