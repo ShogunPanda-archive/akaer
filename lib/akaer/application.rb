@@ -54,10 +54,19 @@ module Akaer
           begin
             @addresses ||= self.compute_addresses
             length = self.pad_number(@addresses.length)
-            [true, Mustache.render(config.send((type == :remove) ? :remove_command : :add_command), {interface: config.interface, address: address.to_s}) + " > /dev/null 2>&1", "{mark=blue}[{mark=bright white}#{self.pad_number((@addresses.index(address) || 0) + 1, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
+            [true, build_command(type, address), "{mark=blue}[{mark=bright white}#{self.pad_number((@addresses.index(address) || 0) + 1, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
           rescue ArgumentError
             [false]
           end
+        end
+
+        # Builds the command to execute.
+        #
+        # @param type [Symbol] The type of operation. Can be `:add` or `:remove`.
+        # @param address [String] The address to manage.
+        # @return [String] The command to execute.
+        def build_command(type, address)
+          Mustache.render(config.send((type == :remove) ? :remove_command : :add_command), {interface: config.interface, address: address.to_s}) + " > /dev/null 2>&1"
         end
 
         # Executes management.
