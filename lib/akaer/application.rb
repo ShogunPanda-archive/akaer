@@ -217,7 +217,7 @@ module Akaer
           begin
             self.logger.info(self.i18n.agent_deleting(launch_agent)) if !quiet
             ::File.delete(launch_agent)
-          rescue => _
+          rescue
             self.logger.warn(self.i18n.agent_deleting_error) if !quiet
             return false
           end
@@ -245,7 +245,7 @@ module Akaer
         def unload_agent(launch_agent, quiet)
           begin
             perform_agent_loading(launch_agent, "unload", :agent_unloading, quiet)
-          rescue => _
+          rescue
             self.logger.warn(self.i18n.agent_unloading_error) if !quiet
             false
           end

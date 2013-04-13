@@ -23,6 +23,6 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version = ">= 1.9.3"
 
-  gem.add_dependency("mamertes", "~> 2.1.0")
+  gem.add_dependency("mamertes", "~> 2.1.2")
   gem.add_dependency("mustache", "~> 0.99.4")
 end
