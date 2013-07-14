@@ -35,15 +35,17 @@
           <p>A small utility to add aliases to network interfaces.</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/ShogunPanda">ShogunPanda</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
 
-        <h1>akaer</h1>
+        <h1>
+<a name="akaer" class="anchor" href="#akaer"><span class="octicon octicon-link"></span></a>akaer</h1>
 
 <p><a href="http://badge.fury.io/rb/akaer"><img src="https://badge.fury.io/rb/akaer.png" alt="Gem Version"></a>
 <a href="https://gemnasium.com/ShogunPanda/akaer"><img src="https://gemnasium.com/ShogunPanda/akaer.png?travis" alt="Dependency Status"></a>
 <a href="http://travis-ci.org/ShogunPanda/akaer"><img src="https://secure.travis-ci.org/ShogunPanda/akaer.png?branch=master" alt="Build Status"></a>
-<a href="https://codeclimate.com/github/ShogunPanda/akaer"><img src="https://codeclimate.com/github/ShogunPanda/akaer.png" alt="Code Climate"></a></p>
+<a href="https://codeclimate.com/github/ShogunPanda/akaer"><img src="https://codeclimate.com/github/ShogunPanda/akaer.png" alt="Code Climate"></a>
+<a href="https://coveralls.io/r/ShogunPanda/akaer"><img src="https://coveralls.io/repos/ShogunPanda/akaer/badge.png" alt="Coverage Status"></a></p>
 
 <p>A small utility to add aliases to network interfaces.</p>
 
@@ -51,11 +53,13 @@
 
 <p><a href="http://rdoc.info/gems/akaer">http://rdoc.info/gems/akaer</a></p>
 
-<h2>Description</h2>
+<h2>
+<a name="description" class="anchor" href="#description"><span class="octicon octicon-link"></span></a>Description</h2>
 
 <p>Akaer is a small utility that adds and removes aliases to your network interfaces. This is useful in web development.</p>
 
-<h2>Basic usage</h2>
+<h2>
+<a name="basic-usage" class="anchor" href="#basic-usage"><span class="octicon octicon-link"></span></a>Basic usage</h2>
 
 <ol>
 <li>
@@ -72,11 +76,13 @@
 </li>
 </ol><p><strong>You're done!</strong></p>
 
-<h2>Advanced usage</h2>
+<h2>
+<a name="advanced-usage" class="anchor" href="#advanced-usage"><span class="octicon octicon-link"></span></a>Advanced usage</h2>
 
 <p>Just type <code>akaer --help</code> and you'll see all available options.</p>
 
-<h2>Configuration</h2>
+<h2>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
 
 <p>By defaults, Akaer uses a configuration file in <code>~/.akaer_config</code>, but you can change the path using the <code>--config</code> switch.</p>
 
@@ -92,9 +98,9 @@
 <li>
 <code>aliases</code>: The number of sequential addresses to add. 5 by default.</li>
 <li>
-<code>add_command</code>: The command to run for adding an alias. <code>sudo ifconfig @INTERFACE@ alias @ALIAS@</code> by default.</li>
+<code>add_command</code>: The command to run for adding an alias. <code>sudo ifconfig {{interface}} alias {{address}}</code> by default.</li>
 <li>
-<code>remove_command</code>: The command to run for removing an alias. <code>sudo ifconfig @INTERFACE@ -alias @ALIAS@</code> by default.</li>
+<code>remove_command</code>: The command to run for removing an alias. <code>sudo ifconfig {{interface}} -alias {{address}}</code> by default.</li>
 <li>
 <code>log_file</code>: The default log file. By default it logs to standard output.</li>
 <li>
@@ -103,7 +109,8 @@
 <code>dry_run</code>: Only show which modifications will be done.</li>
 <li>
 <code>quiet</code>: Do not show any message.</li>
-</ul><h2>Contributing to akaer</h2>
+</ul><h2>
+<a name="contributing-to-akaer" class="anchor" href="#contributing-to-akaer"><span class="octicon octicon-link"></span></a>Contributing to akaer</h2>
 
 <ul>
 <li>Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.</li>
@@ -113,7 +120,8 @@
 <li>Commit and push until you are happy with your contribution.</li>
 <li>Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.</li>
 <li>Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.</li>
-</ul><h2>Copyright</h2>
+</ul><h2>
+<a name="copyright" class="anchor" href="#copyright"><span class="octicon octicon-link"></span></a>Copyright</h2>
 
 <p>Copyright (C) 2013 and above Shogun (<a href="mailto:shogun_panda@me.com">shogun_panda@me.com</a>).</p>
 
