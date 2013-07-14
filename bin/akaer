@@ -28,22 +28,22 @@ Mamertes.App do
 
   command :add do
     description localizer.application_command_add
-    action { |command| Akaer::Application.instance(command).action_add() }
+    action { |command| Akaer::Application.instance(command).action_add }
   end
 
   command :remove do
     description localizer.application_command_remove
-    action { |command| Akaer::Application.instance(command).action_remove() }
+    action { |command| Akaer::Application.instance(command).action_remove }
   end
 
   command :install do
     description localizer.application_command_install
-    action { |command| Akaer::Application.instance(command).action_install() }
+    action { |command| Akaer::Application.instance(command).action_install }
   end
 
   command :uninstall do
     description localizer.application_command_uninstall
-    action { |command| Akaer::Application.instance(command).action_uninstall() }
+    action { |command| Akaer::Application.instance(command).action_uninstall }
   end
 
   action do |command|

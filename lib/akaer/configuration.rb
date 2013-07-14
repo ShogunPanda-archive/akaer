@@ -46,11 +46,11 @@ module Akaer
       super(file, overrides, logger)
 
       # Make sure some arguments are of correct type
-      self.log_file = $stdout if self.log_file == "STDOUT"
-      self.log_file = $stderr if self.log_file == "STDERR"
-      self.addresses = self.addresses.ensure_array
-      self.aliases = self.aliases.to_integer
-      self.log_level = self.log_level.to_integer
+      self.log_file = $stdout if log_file == "STDOUT"
+      self.log_file = $stderr if log_file == "STDERR"
+      self.addresses = addresses.ensure_array
+      self.aliases = aliases.to_integer
+      self.log_level = log_level.to_integer
     end
   end
 end

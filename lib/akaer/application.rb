@@ -27,8 +27,8 @@ module Akaer
       # @param address [String] The address to manage.
       # @return [Boolean] `true` if operation succeeded, `false` otherwise.
       def manage(type, address)
-        locale = self.i18n
-        config = self.config
+        locale = i18n
+        config = config
         quiet = config.quiet
         rv, command, prefix = setup_management(type, address)
 
@@ -52,9 +52,9 @@ module Akaer
         # @return [Array] A list of parameters for the management.
         def setup_management(type, address)
           begin
-            @addresses ||= self.compute_addresses
-            length = self.pad_number(@addresses.length)
-            [true, build_command(type, address), "{mark=blue}[{mark=bright white}#{self.pad_number((@addresses.index(address) || 0) + 1, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
+            @addresses ||= compute_addresses
+            length = pad_number(@addresses.length)
+            [true, build_command(type, address), "{mark=blue}[{mark=bright white}#{pad_number((@addresses.index(address) || 0) + 1, length.length)}{mark=reset blue}/{/mark}#{length}{/mark}]{/mark}"]
           rescue ArgumentError
             [false]
           end
@@ -79,9 +79,9 @@ module Akaer
         # @param quiet [Boolean] Whether to show the message.
         # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def execute_manage(command, prefix, type, address, config, quiet)
-          locale = self.i18n
+          locale = i18n
           log_management(:run, prefix, type, locale.removing, locale.adding, address, config, quiet)
-          rv = self.execute_command(command)
+          rv = execute_command(command)
           labels = (type == :remove ? [locale.remove, locale.from] : [locale.add, locale.to])
           @logger.error(@command.application.console.replace_markers(locale.general_error(labels[0], address, labels[1], config.interface))) if !rv
           rv
@@ -98,9 +98,9 @@ module Akaer
         # @param config [Configuration] The current configuration.
         # @param quiet [Boolean] Whether to show the message.
         def log_management(message, prefix, type, remove_label, add_label, address, config, quiet)
-          locale = self.i18n
+          locale = i18n
           labels = (type == :remove ? [remove_label, locale.from] : [add_label, locale.to])
-          @logger.info(@command.application.console.replace_markers(self.i18n.send(message, prefix, labels[0], address, labels[1], config.interface))) if !quiet
+          @logger.info(@command.application.console.replace_markers(i18n.send(message, prefix, labels[0], address, labels[1], config.interface))) if !quiet
         end
 
         # Manages an action on the request addresses.
@@ -109,13 +109,11 @@ module Akaer
         # @param message [String] The message to show if no addresses are found.
         # @param quiet [Boolean] Whether to show the failure message.
         def manage_action(operation, message, quiet)
-          addresses = self.compute_addresses
+          addresses = compute_addresses
 
           if addresses.present? then
             # Now, for every address, call the command
-            addresses.all? {|address|
-              self.manage(operation, address)
-            }
+            addresses.all? {|address| manage(operation, address) }
           else
             @logger.error(message) if !quiet
           end
@@ -128,28 +126,28 @@ module Akaer
       #
       # @return [Boolean] `true` if action succeeded, `false` otherwise.
       def action_add
-        manage_action(:add, self.i18n.add_empty, self.config.quiet)
+        manage_action(:add, i18n.add_empty, config.quiet)
       end
 
       # Removes aliases from the interface.
       #
       # @return [Boolean] `true` if action succeeded, `false` otherwise.
       def action_remove
-        manage_action(:remove, self.i18n.remove_empty, self.config.quiet)
+        manage_action(:remove, i18n.remove_empty, config.quiet)
       end
 
       # Installs the application into the autolaunch.
       #
       # @return [Boolean] `true` if action succeeded, `false` otherwise.
       def action_install
-        manage_agent(self.launch_agent_path, :create_agent, :load_agent, self.config.quiet)
+        manage_agent(launch_agent_path, :create_agent, :load_agent, config.quiet)
       end
 
       # Uninstalls the application from the autolaunch.
       #
       # @return [Boolean] `true` if action succeeded, `false` otherwise.
       def action_uninstall
-        manage_agent(self.launch_agent_path, :unload_agent, :delete_agent, self.config.quiet)
+        manage_agent(launch_agent_path, :unload_agent, :delete_agent, config.quiet)
       end
 
       private
@@ -172,13 +170,12 @@ module Akaer
         # @param quiet [Boolean] Whether to show messages.
         # @return [Boolean] `true` if the agent is enabled, `false` otherwise.
         def check_agent_available(quiet)
-          rv = true
-          if !self.is_osx? then
-            logger.fatal(self.i18n.no_agent) if !quiet
-            rv = false
+          if is_osx? then
+            true
+          else
+            logger.fatal(i18n.no_agent) if !quiet
+            false
           end
-
-          rv
         end
 
         # Creates a OSX system agent.
@@ -188,12 +185,12 @@ module Akaer
         # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def create_agent(launch_agent, quiet)
           begin
-            self.logger.info(self.i18n.agent_creating(launch_agent)) if !quiet
+            logger.info(i18n.agent_creating(launch_agent)) if !quiet
             write_agent(launch_agent)
-            self.execute_command("plutil -convert binary1 \"#{launch_agent}\"")
+            execute_command("plutil -convert binary1 \"#{launch_agent}\"")
             true
           rescue
-            self.logger.error(self.i18n.agent_creating_error) if !quiet
+            logger.error(i18n.agent_creating_error) if !quiet
             false
           end
         end
@@ -215,11 +212,11 @@ module Akaer
         # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def delete_agent(launch_agent, quiet)
           begin
-            self.logger.info(self.i18n.agent_deleting(launch_agent)) if !quiet
+            logger.info(i18n.agent_deleting(launch_agent)) if !quiet
             ::File.delete(launch_agent)
           rescue
-            self.logger.warn(self.i18n.agent_deleting_error) if !quiet
-            return false
+            logger.warn(i18n.agent_deleting_error) if !quiet
+            false
           end
         end
 
@@ -232,7 +229,7 @@ module Akaer
           begin
             perform_agent_loading(launch_agent, "load", :agent_loading, quiet)
           rescue
-            self.logger.error(self.i18n.agent_loading_error) if !quiet
+            logger.error(i18n.agent_loading_error) if !quiet
             false
           end
         end
@@ -246,7 +243,7 @@ module Akaer
           begin
             perform_agent_loading(launch_agent, "unload", :agent_unloading, quiet)
           rescue
-            self.logger.warn(self.i18n.agent_unloading_error) if !quiet
+            logger.warn(i18n.agent_unloading_error) if !quiet
             false
           end
         end
@@ -259,8 +256,8 @@ module Akaer
         # @param quiet [Boolean] Whether to show messages.
         # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def perform_agent_loading(launch_agent, command, message, quiet)
-          self.logger.info(self.i18n.send(message, launch_agent)) if !quiet
-          self.execute_command("launchctl #{command} -w \"#{launch_agent}\" > /dev/null 2>&1")
+          logger.info(i18n.send(message, launch_agent)) if !quiet
+          execute_command("launchctl #{command} -w \"#{launch_agent}\" > /dev/null 2>&1")
           true
         end
     end
@@ -288,7 +285,7 @@ module Akaer
     # @param command [Mamertes::Command] The current Mamertes command.
     # @param locale [Symbol] The locale to use for the application.
     def initialize(command, locale)
-      self.i18n_setup(:akaer, ::File.absolute_path(::Pathname.new(::File.dirname(__FILE__)).to_s + "/../../locales/"))
+      i18n_setup(:akaer, ::File.absolute_path(::Pathname.new(::File.dirname(__FILE__)).to_s + "/../../locales/"))
       self.i18n = locale
 
       @command = command
@@ -328,9 +325,9 @@ module Akaer
         throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*)?\Z/ =~ address
         throw(:valid, true) if /\A::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*)?\Z/ =~ address
         # IPv6 (IPv4 compat)
-        throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:/ =~ address && self.is_ipv4?($')
-        throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?/ =~ address && self.is_ipv4?($')
-        throw(:valid, true) if /\A::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?/ =~ address && self.is_ipv4?($')
+        throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:/ =~ address && is_ipv4?($')
+        throw(:valid, true) if /\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?/ =~ address && is_ipv4?($')
+        throw(:valid, true) if /\A::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?/ =~ address && is_ipv4?($')
 
         false
       end
@@ -397,9 +394,9 @@ module Akaer
         begin
           @config = Akaer::Configuration.new(options["configuration"], options, @logger)
           @logger = nil
-          @logger = self.get_logger
+          @logger = get_logger
         rescue Bovem::Errors::InvalidConfiguration => e
-          @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal(self.i18n.logging_failed(log_file))
+          @logger ? @logger.fatal(e.message) : Bovem::Logger.create("STDERR").fatal(i18n.logging_failed(log_file))
           raise ::SystemExit
         end
       end
@@ -413,7 +410,7 @@ module Akaer
         filters =  [:ipv4, :ipv6].select {|i| type == i || type == :all }.compact
 
         config.addresses.select { |address|
-          filters.any? {|filter| self.send("is_#{filter}?", address) }
+          filters.any? {|filter| send("is_#{filter}?", address) }
         }.compact.uniq
       end
 
