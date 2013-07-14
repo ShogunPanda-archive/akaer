@@ -28,7 +28,7 @@ module Akaer
       # @return [Boolean] `true` if operation succeeded, `false` otherwise.
       def manage(type, address)
         locale = i18n
-        config = config
+        config = self.config
         quiet = config.quiet
         rv, command, prefix = setup_management(type, address)
 

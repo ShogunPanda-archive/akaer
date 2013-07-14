@@ -39,13 +39,13 @@ describe Akaer::Application do
     end
 
     it("should return the same instance") do
-      ::Akaer::Application.stub(:new) do Time.now end
+      ::Akaer::Application.stub(:new) { Time.now }
       instance = ::Akaer::Application.instance("start")
       expect(::Akaer::Application.instance("stop")).to be(instance)
     end
 
     it("should return a new instance if requested to") do
-      ::Akaer::Application.stub(:new) do Time.now end
+      ::Akaer::Application.stub(:new) { Time.now }
       instance = ::Akaer::Application.instance("")
       expect(::Akaer::Application.instance({"log-file" => "/dev/null"}, nil, true)).not_to be(instance)
     end
