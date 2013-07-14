@@ -251,7 +251,7 @@ module Akaer
             execute_command("launchctl #{command} -w \"#{launch_agent}\" > /dev/null 2>&1")
             true
           rescue
-            logger.warn(i18n.agent_unloading_error) if !quiet
+            logger.send(*(command == "load" ? [:error, i18n.agent_loading_error] : [:warn, i18n.agent_unloading_error])) if !quiet
             false
           end
         end
