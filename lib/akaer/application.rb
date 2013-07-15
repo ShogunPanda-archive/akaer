@@ -18,7 +18,7 @@ module Akaer
       #
       # @return [Boolean] `true` if the current platform is MacOS X, `false` otherwise.
       def is_osx?
-        ::RbConfig::CONFIG['host_os'] =~ /^darwin/
+        !(::RbConfig::CONFIG['host_os'] =~ /^darwin/).nil?
       end
 
       # Adds or removes an alias from the interface.

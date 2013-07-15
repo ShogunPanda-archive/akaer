@@ -171,6 +171,15 @@ describe Akaer::Application do
     end
   end
 
+  describe "#is_osx?" do
+    it "should return the correct information" do
+      stub_const("RbConfig::CONFIG", {"host_os" => "darwin foo"})
+      expect(application.is_osx?).to be_true
+      stub_const("RbConfig::CONFIG", {"host_os" => "another"})
+      expect(application.is_osx?).to be_false
+    end
+  end
+
   describe "#manage" do
     it "should show a right message to the user" do
       application.logger.should_receive(:info).with(/.+.*03.*\/.*05.*.+ *Adding.* address .*10.0.0.3.* to interface .*lo0.*/)
@@ -291,7 +300,7 @@ describe Akaer::Application do
 
     it "should not load an invalid agent" do
       application.stub(:execute_command) do |command|
-        command =~ /^launchctl/ ? raise(StandardError) : system(command)
+        command =~ /^launchctl/ ? raise(StandardError) : true
       end
 
       application.stub(:launch_agent_path).and_return(launch_agent_path)
