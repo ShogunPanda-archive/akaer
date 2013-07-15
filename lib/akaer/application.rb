@@ -252,7 +252,7 @@ module Akaer
             execute_command("launchctl #{command} -w \"#{launch_agent}\" > /dev/null 2>&1")
             true
           rescue
-            logger.send(command == "load" ? :error : :warn, error_message) if !quiet
+            logger.send(command == "load" ? :error : :warn, i18n.send(error_message)) if !quiet
             false
           end
         end

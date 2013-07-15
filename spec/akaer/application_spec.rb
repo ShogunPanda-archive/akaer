@@ -265,37 +265,35 @@ describe Akaer::Application do
   end
 
   describe "#action_install" do
-    if ::RbConfig::CONFIG['host_os'] =~ /^darwin/ then
-      it "should create the agent" do
-        application.stub(:launch_agent_path).and_return(launch_agent_path)
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+    it "should create the agent" do
+      application.stub(:launch_agent_path).and_return(launch_agent_path)
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
 
-        application.action_install
-        expect(::File.exists?(application.launch_agent_path)).to be_true
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+      application.action_install
+      expect(::File.exists?(application.launch_agent_path)).to be_true
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+    end
+
+    it "should not create and invalid agent" do
+      application.stub(:launch_agent_path).and_return("/invalid/agent")
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+
+      application.logger.should_receive(:error).with("Cannot create the launch agent.")
+      application.action_install
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+    end
+
+    it "should not load an invalid agent" do
+      application.stub(:execute_command) do |command|
+        command =~ /^launchctl/ ? raise(StandardError) : system(command)
       end
 
-      it "should not create and invalid agent" do
-        application.stub(:launch_agent_path).and_return("/invalid/agent")
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+      application.stub(:launch_agent_path).and_return(launch_agent_path)
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
 
-        application.logger.should_receive(:error).with("Cannot create the launch agent.")
-        application.action_install
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
-      end
-
-      it "should not load an invalid agent" do
-        application.stub(:execute_command) do |command|
-          command =~ /^launchctl/ ? raise(StandardError) : system(command)
-        end
-
-        application.stub(:launch_agent_path).and_return(launch_agent_path)
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
-
-        application.logger.should_receive(:error).with("Cannot load the launch agent.")
-        application.action_install
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
-      end
+      application.logger.should_receive(:error).with("Cannot load the launch agent.")
+      application.action_install
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
     end
 
     it "should raise an exception if not running on OSX" do
@@ -306,45 +304,43 @@ describe Akaer::Application do
   end
 
   describe "#action_uninstall" do
-    if ::RbConfig::CONFIG['host_os'] =~ /^darwin/ then
-      it "should remove the agent" do
-        application.stub(:launch_agent_path).and_return(launch_agent_path)
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+    it "should remove the agent" do
+      application.stub(:launch_agent_path).and_return(launch_agent_path)
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
 
-        Bovem::Logger.stub(:default_file).and_return($stdout)
-        application.action_install
-        application.action_uninstall
-        expect(::File.exists?(application.launch_agent_path)).to be_false
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
-      end
+      Bovem::Logger.stub(:default_file).and_return($stdout)
+      application.action_install
+      application.action_uninstall
+      expect(::File.exists?(application.launch_agent_path)).to be_false
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+    end
 
-      it "should not load delete an invalid resolver" do
-        application.stub(:launch_agent_path).and_return("/invalid/agent")
+    it "should not load delete an invalid resolver" do
+      application.stub(:launch_agent_path).and_return("/invalid/agent")
 
-        application.action_install
-        application.logger.should_receive(:warn).at_least(1)
-        application.action_uninstall
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
-      end
+      application.action_install
+      application.logger.should_receive(:warn).at_least(1)
+      application.action_uninstall
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+    end
 
-      it "should not delete an invalid agent" do
-        application.stub(:launch_agent_path).and_return("/invalid/agent")
+    it "should not delete an invalid agent" do
+      application.stub(:launch_agent_path).and_return("/invalid/agent")
 
-        application.action_install
-        application.logger.should_receive(:warn).at_least(1)
-        application.action_uninstall
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
-      end
+      application.action_install
+      application.logger.should_receive(:warn).at_least(1)
+      application.action_uninstall
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
+    end
 
-      it "should not load delete invalid agent" do
-        application.stub(:launch_agent_path).and_return("/invalid/agent")
+    it "should not load delete invalid agent" do
+      application.stub(:launch_agent_path).and_return("/invalid/agent")
 
-        application.action_install
-        application.stub(:execute_command).and_raise(StandardError)
-        application.logger.should_receive(:warn).at_least(1)
-        application.action_uninstall
-        ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
-      end
+      application.action_install
+      application.stub(:execute_command).and_raise(StandardError)
+      application.logger.should_receive(:warn).at_least(1)
+      application.action_uninstall
+      ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
     end
 
     it "should raise an exception if not running on OSX" do
