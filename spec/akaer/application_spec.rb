@@ -265,6 +265,11 @@ describe Akaer::Application do
   end
 
   describe "#action_install" do
+    before(:each) do
+      application.stub(:is_osx?).and_return(true)
+      application.stub(:execute_command)
+    end
+
     it "should create the agent" do
       application.stub(:launch_agent_path).and_return(launch_agent_path)
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
@@ -276,6 +281,7 @@ describe Akaer::Application do
 
     it "should not create and invalid agent" do
       application.stub(:launch_agent_path).and_return("/invalid/agent")
+
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
 
       application.logger.should_receive(:error).with("Cannot create the launch agent.")
@@ -304,6 +310,11 @@ describe Akaer::Application do
   end
 
   describe "#action_uninstall" do
+    before(:each) do
+      application.stub(:is_osx?).and_return(true)
+      application.stub(:execute_command)
+    end
+
     it "should remove the agent" do
       application.stub(:launch_agent_path).and_return(launch_agent_path)
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
