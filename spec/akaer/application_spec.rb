@@ -26,41 +26,41 @@ describe Akaer::Application do
   end
 
   before(:each) do
-    Bovem::Logger.stub(:default_file).and_return("/dev/null")
+    allow(Bovem::Logger).to receive(:default_file).and_return("/dev/null")
   end
   let(:log_file) { "/dev/null" }
   let(:application){ create_application({"log-file" => log_file}) }
   let(:launch_agent_path) { "/tmp/akaer-test-agent-#{Time.now.strftime("%Y%m%d-%H%M%S")}" }
 
   describe ".instance" do
-    it("should call .new with the passed arguments") do
-      ::Akaer::Application.should_receive(:new).with("FOO", :es)
+    it "should call .new with the passed arguments" do
+      expect(::Akaer::Application).to receive(:new).with("FOO", :es)
       ::Akaer::Application.instance("FOO", :es)
     end
 
-    it("should return the same instance") do
-      ::Akaer::Application.stub(:new) { Time.now }
+    it "should return the same instance" do
+      allow(::Akaer::Application).to receive(:new) { Time.now }
       instance = ::Akaer::Application.instance("start")
       expect(::Akaer::Application.instance("stop")).to be(instance)
     end
 
-    it("should return a new instance if requested to") do
-      ::Akaer::Application.stub(:new) { Time.now }
+    it "should return a new instance if requested to" do
+      allow(::Akaer::Application).to receive(:new) { Time.now }
       instance = ::Akaer::Application.instance("")
       expect(::Akaer::Application.instance({"log-file" => "/dev/null"}, nil, true)).not_to be(instance)
     end
   end
 
   describe "#initialize" do
-    it("should setup the logger") do
+    it "should setup the logger" do
       expect(application.logger).not_to be_nil
     end
 
-    it("should setup the configuration") do
+    it "should setup the configuration" do
       expect(application.config).not_to be_nil
     end
 
-    it("should abort with an invalid configuration") do
+    it "should abort with an invalid configuration" do
       path = "/tmp/akaer-test-#{Time.now.strftime("%Y%m%d-%H:%M:%S")}"
       file = ::File.new(path, "w")
       file.write("config.aliases = ")
@@ -166,7 +166,7 @@ describe Akaer::Application do
 
   describe "#execute_command" do
     it "should forward to system" do
-      Kernel.should_receive("system")
+      expect(Kernel).to receive("system")
       application.execute_command("echo OK")
     end
   end
@@ -182,18 +182,18 @@ describe Akaer::Application do
 
   describe "#manage" do
     it "should show a right message to the user" do
-      application.logger.should_receive(:info).with(/.+.*03.*\/.*05.*.+ *Adding.* address .*10.0.0.3.* to interface .*lo0.*/)
+      expect(application.logger).to receive(:info).with(/.+.*03.*\/.*05.*.+ *Adding.* address .*10.0.0.3.* to interface .*lo0.*/)
       application.manage(:add, "10.0.0.3")
 
-      application.logger.should_receive(:info).with(/.+.*03.*\/.*05.*.+ *Removing.* address .*10.0.0.3.* from interface .*lo0.*/)
+      expect(application.logger).to receive(:info).with(/.+.*03.*\/.*05.*.+ *Removing.* address .*10.0.0.3.* from interface .*lo0.*/)
       application.manage(:remove, "10.0.0.3")
     end
 
     it "should call the right system command" do
-      application.should_receive(:execute_command).with("sudo ifconfig lo0 alias 10.0.0.3 > /dev/null 2>&1")
+      expect(application).to receive(:execute_command).with("sudo ifconfig lo0 alias 10.0.0.3 > /dev/null 2>&1")
       application.manage(:add, "10.0.0.3")
 
-      application.should_receive(:execute_command).with("sudo ifconfig lo0 -alias 10.0.0.3 > /dev/null 2>&1")
+      expect(application).to receive(:execute_command).with("sudo ifconfig lo0 -alias 10.0.0.3 > /dev/null 2>&1")
       application.manage(:remove, "10.0.0.3")
     end
 
@@ -209,78 +209,78 @@ describe Akaer::Application do
     it "should respect dry-run mode" do
       other_application = create_application({"log-file" => log_file, "dry-run" => true})
 
-      other_application.logger.should_receive(:info).with(/.+.*03.*\/.*05.*.+ I will .*add.* address .*10.0.0.3.* to interface .*lo0.*/)
-      other_application.should_not_receive(:execute_command)
+      expect(other_application.logger).to receive(:info).with(/.+.*03.*\/.*05.*.+ I will .*add.* address .*10.0.0.3.* to interface .*lo0.*/)
+      expect(other_application).not_to receive(:execute_command)
       other_application.manage(:add, "10.0.0.3")
 
-      other_application.logger.should_receive(:info).with(/.+.*03.*\/.*05.*.+ I will .*remove.* address .*10.0.0.3.* from interface .*lo0.*/)
-      other_application.should_not_receive(:execute_command)
+      expect(other_application.logger).to receive(:info).with(/.+.*03.*\/.*05.*.+ I will .*remove.* address .*10.0.0.3.* from interface .*lo0.*/)
+      expect(other_application).not_to receive(:execute_command)
       other_application.manage(:remove, "10.0.0.3")
     end
   end
 
   describe "#action_add" do
-    it("should compute addresses to manage") do
-      application.should_receive(:compute_addresses)
+    it "should compute addresses to manage" do
+      expect(application).to receive(:compute_addresses)
       application.action_add
     end
 
-    it("should call #manage for every command") do
-      application.stub(:manage) do |operation, address|
+    it "should call #manage for every command" do
+      allow(application).to receive(:manage) do |operation, address|
         address !~ /3$/
       end
 
-      application.should_receive(:manage).at_most(application.compute_addresses.length).with(:add, /.+/)
+      expect(application).to receive(:manage).at_most(application.compute_addresses.length).with(:add, /.+/)
       application.action_add
     end
 
-    it("should show an error there's no address to manage") do
-      application.stub(:compute_addresses).and_return([])
+    it "should show an error there's no address to manage" do
+      allow(application).to receive(:compute_addresses).and_return([])
       other_application = create_application({"log-file" => log_file, "quiet" => true})
-      other_application.stub(:compute_addresses).and_return([])
+      allow(other_application).to receive(:compute_addresses).and_return([])
 
-      application.logger.should_receive(:error).with("No valid addresses to add to the interface found.")
+      expect(application.logger).to receive(:error).with("No valid addresses to add to the interface found.")
       application.action_add
-      other_application.logger.should_not_receive(:error)
+      expect(other_application.logger).not_to receive(:error)
       other_application.action_add
     end
   end
 
   describe "#action_remove" do
-    it("should compute addresses to manage") do
-      application.should_receive(:compute_addresses)
+    it "should compute addresses to manage" do
+      expect(application).to receive(:compute_addresses)
       application.action_remove
     end
 
-    it("should call #manage for every command") do
-      application.stub(:manage) do |operation, address|
+    it "should call #manage for every command" do
+      allow(application).to receive(:manage) do |operation, address|
         address !~ /3$/
       end
 
-      application.should_receive(:manage).at_most(application.compute_addresses.length).with(:remove, /.+/)
+      expect(application).to receive(:manage).at_most(application.compute_addresses.length).with(:remove, /.+/)
       application.action_remove
     end
 
-    it("should show an error there's no address to manage") do
-      application.stub(:compute_addresses).and_return([])
+    it "should show an error there's no address to manage" do
+      allow(application).to receive(:compute_addresses).and_return([])
       other_application = create_application({"log-file" => log_file, "quiet" => true})
-      other_application.stub(:compute_addresses).and_return([])
+      allow(other_application).to receive(:compute_addresses).and_return([])
 
-      application.logger.should_receive(:error).with("No valid addresses to remove from the interface found.")
+      expect(application.logger).to receive(:error).with("No valid addresses to remove from the interface found.")
       application.action_remove
-      other_application.logger.should_not_receive(:error)
+      expect(other_application.logger).not_to receive(:error)
       other_application.action_remove
     end
   end
 
   describe "#action_install" do
     before(:each) do
-      application.stub(:is_osx?).and_return(true)
-      application.stub(:execute_command)
+      allow(application).to receive(:is_osx?).and_return(true)
+      allow(application).to receive(:execute_command)
     end
 
     it "should create the agent" do
-      application.stub(:launch_agent_path).and_return(launch_agent_path)
+      allow(application).to receive(:launch_agent_path).and_return(launch_agent_path)
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
 
       application.action_install
@@ -289,46 +289,46 @@ describe Akaer::Application do
     end
 
     it "should not create and invalid agent" do
-      application.stub(:launch_agent_path).and_return("/invalid/agent")
+      allow(application).to receive(:launch_agent_path).and_return("/invalid/agent")
 
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
 
-      application.logger.should_receive(:error).with("Cannot create the launch agent.")
+      expect(application.logger).to receive(:error).with("Cannot create the launch agent.")
       application.action_install
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
     end
 
     it "should not load an invalid agent" do
-      application.stub(:execute_command) do |command|
+      allow(application).to receive(:execute_command) do |command|
         command =~ /^launchctl/ ? raise(StandardError) : true
       end
 
-      application.stub(:launch_agent_path).and_return(launch_agent_path)
+      allow(application).to receive(:launch_agent_path).and_return(launch_agent_path)
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
 
-      application.logger.should_receive(:error).with("Cannot load the launch agent.")
+      expect(application.logger).to receive(:error).with("Cannot load the launch agent.")
       application.action_install
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
     end
 
     it "should raise an exception if not running on OSX" do
-      application.stub(:is_osx?).and_return(false)
-      application.logger.should_receive(:fatal).with("Installing akaer on autolaunch is only available on MacOSX.")
+      allow(application).to receive(:is_osx?).and_return(false)
+      expect(application.logger).to receive(:fatal).with("Installing akaer on autolaunch is only available on MacOSX.")
       expect(application.action_install).to be_false
     end
   end
 
   describe "#action_uninstall" do
     before(:each) do
-      application.stub(:is_osx?).and_return(true)
-      application.stub(:execute_command)
+      allow(application).to receive(:is_osx?).and_return(true)
+      allow(application).to receive(:execute_command)
     end
 
     it "should remove the agent" do
-      application.stub(:launch_agent_path).and_return(launch_agent_path)
+      allow(application).to receive(:launch_agent_path).and_return(launch_agent_path)
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
 
-      Bovem::Logger.stub(:default_file).and_return($stdout)
+      allow(Bovem::Logger).to receive(:default_file).and_return($stdout)
       application.action_install
       application.action_uninstall
       expect(::File.exists?(application.launch_agent_path)).to be_false
@@ -336,36 +336,36 @@ describe Akaer::Application do
     end
 
     it "should not load delete an invalid resolver" do
-      application.stub(:launch_agent_path).and_return("/invalid/agent")
+      allow(application).to receive(:launch_agent_path).and_return("/invalid/agent")
 
       application.action_install
-      application.logger.should_receive(:warn).at_least(1)
+      expect(application.logger).to receive(:warn).at_least(1)
       application.action_uninstall
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
     end
 
     it "should not delete an invalid agent" do
-      application.stub(:launch_agent_path).and_return("/invalid/agent")
+      allow(application).to receive(:launch_agent_path).and_return("/invalid/agent")
 
       application.action_install
-      application.logger.should_receive(:warn).at_least(1)
+      expect(application.logger).to receive(:warn).at_least(1)
       application.action_uninstall
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
     end
 
     it "should not load delete invalid agent" do
-      application.stub(:launch_agent_path).and_return("/invalid/agent")
+      allow(application).to receive(:launch_agent_path).and_return("/invalid/agent")
 
       application.action_install
-      application.stub(:execute_command).and_raise(StandardError)
-      application.logger.should_receive(:warn).at_least(1)
+      allow(application).to receive(:execute_command).and_raise(StandardError)
+      expect(application.logger).to receive(:warn).at_least(1)
       application.action_uninstall
       ::File.unlink(application.launch_agent_path) if ::File.exists?(application.launch_agent_path)
     end
 
     it "should raise an exception if not running on OSX" do
-      application.stub(:is_osx?).and_return(false)
-      application.logger.should_receive(:fatal).with("Installing akaer on autolaunch is only available on MacOSX.")
+      allow(application).to receive(:is_osx?).and_return(false)
+      expect(application.logger).to receive(:fatal).with("Installing akaer on autolaunch is only available on MacOSX.")
       expect(application.action_uninstall).to be_false
     end
   end
