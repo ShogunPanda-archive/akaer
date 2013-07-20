@@ -226,7 +226,7 @@ module Akaer
         # @param quiet [Boolean] Whether to show messages.
         # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def load_agent(launch_agent, quiet)
-          perform_agent_loading(launch_agent, "load", :agent_loading, :agent_loading_error, quiet)
+          perform_agent_loading(launch_agent, "load", :agent_loading, :agent_loading_error, :error, quiet)
         end
 
         # Unloads a OSX system agent.
@@ -235,7 +235,7 @@ module Akaer
         # @param quiet [Boolean] Whether to show messages.
         # @return [Boolean] `true` if operation succeeded, `false` otherwise.
         def unload_agent(launch_agent, quiet)
-          perform_agent_loading(launch_agent, "unload", :agent_unloading, :agent_unloading_error, quiet)
+          perform_agent_loading(launch_agent, "unload", :agent_unloading, :agent_unloading_error, :warn, quiet)
         end
 
         # Performs operation on a OSX system agent.
@@ -244,15 +244,16 @@ module Akaer
         # @param command [String] The command to run.
         # @param message [String] The message to show.
         # @param error_message [String] The error message to show.
+        # @param error_level [Symbol] The log level for errors.
         # @param quiet [Boolean] Whether to show messages.
         # @return [Boolean] `true` if operation succeeded, `false` otherwise.
-        def perform_agent_loading(launch_agent, command, message, error_message, quiet)
+        def perform_agent_loading(launch_agent, command, message, error_message, error_level, quiet)
           begin
             logger.info(i18n.send(message, launch_agent)) if !quiet
             execute_command("launchctl #{command} -w \"#{launch_agent}\" > /dev/null 2>&1")
             true
           rescue
-            logger.send(command == "load" ? :error : :warn, i18n.send(error_message)) if !quiet
+            logger.send(error_level, i18n.send(error_message)) if !quiet
             false
           end
         end
