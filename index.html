@@ -54,73 +54,15 @@
 <p><a href="http://rdoc.info/gems/akaer">http://rdoc.info/gems/akaer</a></p>
 
 <h2>
-<a name="description" class="anchor" href="#description"><span class="octicon octicon-link"></span></a>Description</h2>
+<a name="end-of-development-notice" class="anchor" href="#end-of-development-notice"><span class="octicon octicon-link"></span></a>END OF DEVELOPMENT NOTICE</h2>
 
-<p>Akaer is a small utility that adds and removes aliases to your network interfaces. This is useful in web development.</p>
+<h1>
+<a name="this-gem-has-been-discontinued" class="anchor" href="#this-gem-has-been-discontinued"><span class="octicon octicon-link"></span></a> This gem has been discontinued.</h1>
 
-<h2>
-<a name="basic-usage" class="anchor" href="#basic-usage"><span class="octicon octicon-link"></span></a>Basic usage</h2>
-
-<ol>
-<li>
-<p>Install the gem:</p>
-
-<div class="highlight"><pre>gem install akaer
-</pre></div>
-</li>
-<li>
-<p>Run the application:</p>
-
-<div class="highlight"><pre>akaer
-</pre></div>
-</li>
-</ol><p><strong>You're done!</strong></p>
+<h3>
+<a name="since-version-300-all-its-functionalities-are-merged-in-devdnsd" class="anchor" href="#since-version-300-all-its-functionalities-are-merged-in-devdnsd"><span class="octicon octicon-link"></span></a>Since version 3.0.0, all its functionalities are merged in <a href="http://sw.cow.tc/devdnsd">devdnsd</a>.</h3>
 
 <h2>
-<a name="advanced-usage" class="anchor" href="#advanced-usage"><span class="octicon octicon-link"></span></a>Advanced usage</h2>
-
-<p>Just type <code>akaer --help</code> and you'll see all available options.</p>
-
-<h2>
-<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
-
-<p>By defaults, Akaer uses a configuration file in <code>~/.akaer_config</code>, but you can change the path using the <code>--config</code> switch.</p>
-
-<p>The file is a plain Ruby file with a single <code>config</code> object that supports the following directives.</p>
-
-<ul>
-<li>
-<code>interface</code>: The network interface to manage. <code>lo0</code> by default.</li>
-<li>
-<code>addresses</code>: A specific list of aliases to manage.</li>
-<li>
-<code>start_address</code>: The address to start sequential address. <code>10.0.0.1</code> by default. Not used if <code>addresses</code> is specified.</li>
-<li>
-<code>aliases</code>: The number of sequential addresses to add. 5 by default.</li>
-<li>
-<code>add_command</code>: The command to run for adding an alias. <code>sudo ifconfig {{interface}} alias {{address}}</code> by default.</li>
-<li>
-<code>remove_command</code>: The command to run for removing an alias. <code>sudo ifconfig {{interface}} -alias {{address}}</code> by default.</li>
-<li>
-<code>log_file</code>: The default log file. By default it logs to standard output.</li>
-<li>
-<code>log_level</code>: The default log level. Valid values are from 0 to 5 where 0 means "all messages".</li>
-<li>
-<code>dry_run</code>: Only show which modifications will be done.</li>
-<li>
-<code>quiet</code>: Do not show any message.</li>
-</ul><h2>
-<a name="contributing-to-akaer" class="anchor" href="#contributing-to-akaer"><span class="octicon octicon-link"></span></a>Contributing to akaer</h2>
-
-<ul>
-<li>Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.</li>
-<li>Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.</li>
-<li>Fork the project.</li>
-<li>Start a feature/bugfix branch.</li>
-<li>Commit and push until you are happy with your contribution.</li>
-<li>Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.</li>
-<li>Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.</li>
-</ul><h2>
 <a name="copyright" class="anchor" href="#copyright"><span class="octicon octicon-link"></span></a>Copyright</h2>
 
 <p>Copyright (C) 2013 and above Shogun (<a href="mailto:shogun_panda@me.com">shogun_panda@me.com</a>).</p>
