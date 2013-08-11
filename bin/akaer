@@ -7,7 +7,7 @@
 require "rubygems"
 require "akaer"
 
-Mamertes.App do
+Bovem::Application.create do
   localizer = Lazier::Localizer.new(:akaer, ::File.absolute_path(::Pathname.new(::File.dirname(__FILE__)).to_s + "/../locales/")).i18n
 
   name "Akaer"

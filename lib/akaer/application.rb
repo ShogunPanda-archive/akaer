@@ -265,7 +265,7 @@ module Akaer
   # @attribute config
   #   @return [Configuration] The {Configuration Configuration} of this application.
   # @attribute command
-  #   @return [Mamertes::Command] The Mamertes command.
+  #   @return [Bovem::Command] The Bovem command.
   # @attribute
   #   @return [Bovem::Logger] logger The logger for this application.
   class Application
@@ -279,7 +279,7 @@ module Akaer
 
     # Creates a new application.
     #
-    # @param command [Mamertes::Command] The current Mamertes command.
+    # @param command [Bovem::Command] The current Bovem command.
     # @param locale [Symbol] The locale to use for the application.
     def initialize(command, locale)
       i18n_setup(:akaer, ::File.absolute_path(::Pathname.new(::File.dirname(__FILE__)).to_s + "/../../locales/"))
@@ -289,7 +289,6 @@ module Akaer
       options = @command.application.get_options.reject {|_, v| v.nil? }
 
       # Setup logger
-      Bovem::Logger.start_time = Time.now
       @logger = Bovem::Logger.create(Bovem::Logger.get_real_file(options["log_file"]) || Bovem::Logger.default_file, Logger::INFO)
 
       # Open configuration
@@ -374,7 +373,7 @@ module Akaer
 
     # Returns a unique (singleton) instance of the application.
     #
-    # @param command [Mamertes::Command] The current Mamertes command.
+    # @param command [Bovem::Command] The current Bovem command.
     # @param locale [Symbol] The locale to use for the application.
     # @param force [Boolean] If to force recreation of the instance.
     # @return [Application] The unique (singleton) instance of the application.

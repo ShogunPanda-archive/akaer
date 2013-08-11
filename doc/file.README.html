@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>
   File: README
   
@@ -64,7 +64,6 @@
     <div id="content"><div id='filecontents'><h1 id="akaer">akaer</h1>
 
 <p><a href="http://badge.fury.io/rb/akaer"><img src="https://badge.fury.io/rb/akaer.png" alt="Gem Version" /></a>
-<a href="https://gemnasium.com/ShogunPanda/akaer"><img src="https://gemnasium.com/ShogunPanda/akaer.png?travis" alt="Dependency Status" /></a>
 <a href="http://travis-ci.org/ShogunPanda/akaer"><img src="https://secure.travis-ci.org/ShogunPanda/akaer.png?branch=master" alt="Build Status" /></a>
 <a href="https://codeclimate.com/github/ShogunPanda/akaer"><img src="https://codeclimate.com/github/ShogunPanda/akaer.png" alt="Code Climate" /></a>
 <a href="https://coveralls.io/r/ShogunPanda/akaer"><img src="https://coveralls.io/repos/ShogunPanda/akaer/badge.png" alt="Coverage Status" /></a></p>
@@ -75,67 +74,11 @@
 
 <p>http://rdoc.info/gems/akaer</p>
 
-<h2 id="description">Description</h2>
+<h2 id="end-of-development-notice">END OF DEVELOPMENT NOTICE</h2>
 
-<p>Akaer is a small utility that adds and removes aliases to your network interfaces. This is useful in web development.</p>
+<h1 id="this-gem-has-been-discontinued"> This gem has been discontinued.</h1>
 
-<h2 id="basic-usage">Basic usage</h2>
-
-<ol>
-  <li>Install the gem:</li>
-</ol>
-
- 	```sh
-<pre class="code ruby"><code class="ruby">gem install akaer
-```
-</code></pre>
-
-<ol>
-  <li>
-    <p>Run the application:</p>
-
-    <p><code>sh
- akaer
- 	</code></p>
-  </li>
-</ol>
-
-<p><strong>You&#8217;re done!</strong></p>
-
-<h2 id="advanced-usage">Advanced usage</h2>
-
-<p>Just type <code>akaer --help</code> and you&#8217;ll see all available options.</p>
-
-<h2 id="configuration">Configuration</h2>
-
-<p>By defaults, Akaer uses a configuration file in <code>~/.akaer_config</code>, but you can change the path using the <code>--config</code> switch.</p>
-
-<p>The file is a plain Ruby file with a single <code>config</code> object that supports the following directives.</p>
-
-<ul>
-  <li><code>interface</code>: The network interface to manage. <code>lo0</code> by default.</li>
-  <li><code>addresses</code>: A specific list of aliases to manage.</li>
-  <li><code>start_address</code>: The address to start sequential address. <code>10.0.0.1</code> by default. Not used if <code>addresses</code> is specified.</li>
-  <li><code>aliases</code>: The number of sequential addresses to add. 5 by default.</li>
-  <li><code>add_command</code>: The command to run for adding an alias. <code>sudo ifconfig {{interface}} alias {{address}}</code> by default.</li>
-  <li><code>remove_command</code>: The command to run for removing an alias. <code>sudo ifconfig {{interface}} -alias {{address}}</code> by default.</li>
-  <li><code>log_file</code>: The default log file. By default it logs to standard output.</li>
-  <li><code>log_level</code>: The default log level. Valid values are from 0 to 5 where 0 means &#8220;all messages&#8221;.</li>
-  <li><code>dry_run</code>: Only show which modifications will be done.</li>
-  <li><code>quiet</code>: Do not show any message.</li>
-</ul>
-
-<h2 id="contributing-to-akaer">Contributing to akaer</h2>
-
-<ul>
-  <li>Check out the latest master to make sure the feature hasn&#8217;t been implemented or the bug hasn&#8217;t been fixed yet.</li>
-  <li>Check out the issue tracker to make sure someone already hasn&#8217;t requested it and/or contributed it.</li>
-  <li>Fork the project.</li>
-  <li>Start a feature/bugfix branch.</li>
-  <li>Commit and push until you are happy with your contribution.</li>
-  <li>Make sure to add tests for it. This is important so I don&#8217;t break it in a future version unintentionally.</li>
-  <li>Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.</li>
-</ul>
+<h3 id="since-version-300-all-its-functionalities-are-merged-in-devdnsdhttpswcowtcdevdnsd">Since version 3.0.0, all its functionalities are merged in <a href="http://sw.cow.tc/devdnsd">devdnsd</a>.</h3>
 
 <h2 id="copyright">Copyright</h2>
 
@@ -145,7 +88,7 @@
 </div></div>
 
     <div id="footer">
-  Generated on Sat Jul 20 15:44:45 2013 by
+  Generated on Sun Aug 11 15:51:58 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.6.2 (ruby-1.9.3).
 </div>

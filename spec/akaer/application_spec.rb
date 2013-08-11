@@ -8,7 +8,7 @@ require "spec_helper"
 
 describe Akaer::Application do
   def create_application(overrides)
-    mamertes_app = Mamertes::App(run: false) do
+    mamertes_app = Bovem::Application.create(run: false) do
       option :configuration, [], {type: String, default: overrides["configuration"] || "/dev/null"}
       option :interface, [], {type: String, default: overrides["interface"] || "lo0"}
       option :addresses, [], {type: Array, default: overrides["addresses"] || []}
