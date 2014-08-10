@@ -7,7 +7,7 @@
 
 A small utility to add aliases to network interfaces.
 
-http://sw.cow.tc/akaer
+http://sw.cowtech.it/akaer
 
 http://rdoc.info/gems/akaer
 
@@ -15,7 +15,7 @@ http://rdoc.info/gems/akaer
 
 # This gem has been discontinued.
 
-### Since version 3.0.0, all its functionalities are merged in [devdnsd](http://sw.cow.tc/devdnsd).
+### Since version 3.0.0, all its functionalities are merged in [devdnsd](http://sw.cowtech.it/devdnsd).
 
 ## Copyright
 

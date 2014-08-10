@@ -11,7 +11,7 @@ Gem::Specification.new do |gem|
   gem.version = Akaer::Version::STRING
   gem.authors = ["Shogun"]
   gem.email = ["shogun@cowtech.it"]
-  gem.homepage = "http://sw.cow.tc/akaer"
+  gem.homepage = "http://sw.cowtech.it/akaer"
   gem.summary = %q{A small utility to add aliases to network interfaces.}
   gem.description = %q{A small utility to add aliases to network interfaces.}
 
